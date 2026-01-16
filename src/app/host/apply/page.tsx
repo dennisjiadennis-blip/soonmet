@@ -31,11 +31,18 @@ export default function BecomeHostPage() {
     location: "",
     activityTitle: "",
     activityType: "Coffee",
-    activityDesc: ""
+    activityDesc: "",
+    activityDuration: "60",
+    activityPrice: "",
+    zoomMeeting: false
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleToggleChange = (name: string, value: boolean) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -444,9 +451,9 @@ export default function BecomeHostPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Event Price ($)</label>
+                        <label className="text-sm font-medium text-zinc-400">Event Price (¥)</label>
                         <div className="relative">
-                          <span className="absolute left-4 top-3.5 text-zinc-500">$</span>
+                          <span className="absolute left-4 top-3.5 text-zinc-500">¥</span>
                           <input 
                             required
                             type="number"
@@ -456,7 +463,7 @@ export default function BecomeHostPage() {
                             onChange={handleInputChange}
                             onFocus={() => handleFocus('activityPrice')}
                             className="w-full bg-black/40 border border-white/10 rounded-xl pl-8 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                            placeholder="30"
+                            placeholder="3000"
                           />
                         </div>
                       </div>

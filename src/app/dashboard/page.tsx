@@ -142,7 +142,7 @@ function DashboardContent() {
                       </div>
                       <div className="p-4">
                         <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">Hidden Jazz Bars</h4>
-                        <p className="text-sm text-zinc-500">Shinjuku • $45</p>
+                        <p className="text-sm text-zinc-500">Shinjuku • ¥6,000</p>
                       </div>
                     </div>
                   ))}
