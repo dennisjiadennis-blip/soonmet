@@ -98,24 +98,11 @@ export function Hero() {
 
         {/* AI Agent Interface */}
         <div className="relative w-full max-w-3xl group mx-auto">
-          {/* Glowing Background Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-rose-500 via-fuchsia-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
-          
-          <div className={`relative flex items-center overflow-hidden rounded-2xl transition-all duration-300 ${
-            isThinking 
-              ? "bg-white border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.5)]" 
-              : "bg-white/95 border-2 border-transparent hover:scale-[1.01] shadow-2xl"
-          }`}>
-            
-            {/* Icon Status */}
-            <div className="pl-6 pr-4">
-              {isThinking ? (
-                <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
-              ) : (
-                <Sparkles className="h-8 w-8 text-rose-500 animate-pulse" />
-              )}
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-75 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200" />
+          <div className="relative flex items-center rounded-full bg-white p-2 shadow-2xl ring-1 ring-black/5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-lg animate-pulse">
+              <Sparkles className="h-6 w-6" />
             </div>
-
             <input
               ref={inputRef}
               type="text"
@@ -123,30 +110,33 @@ export function Hero() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
+              className="flex-1 bg-transparent px-6 py-4 text-lg text-gray-900 placeholder:text-gray-400 focus:outline-none"
               disabled={isThinking}
-              className="h-24 w-full bg-transparent text-xl sm:text-2xl text-zinc-900 placeholder-zinc-400 outline-none font-medium"
             />
-
-            {/* Action Button */}
             <button 
               onClick={handleAgentAction}
-              disabled={isThinking || !query.trim()}
-              className={`mr-4 p-4 rounded-xl transition-all ${
-                query.trim() 
-                  ? "bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-lg hover:shadow-rose-500/30 hover:scale-105" 
-                  : "bg-zinc-100 text-zinc-300 cursor-not-allowed"
-              }`}
+              disabled={isThinking}
+              className="mr-1 rounded-full bg-zinc-900 px-8 py-3 font-semibold text-white transition-all hover:bg-zinc-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              <ArrowRight className="h-6 w-6" />
+              {isThinking ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Thinking...</span>
+                </>
+              ) : (
+                <>
+                  <span>Ask AI</span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </button>
           </div>
-
-          {/* Helper Text */}
-          <div className={`absolute -bottom-10 left-0 right-0 transition-opacity duration-300 ${isThinking ? 'opacity-100' : 'opacity-0'}`}>
-            <p className="text-base text-indigo-200 font-medium flex items-center justify-center gap-2 bg-black/50 py-1 px-4 rounded-full mx-auto w-fit backdrop-blur-sm">
-              <Sparkles className="h-4 w-4 text-indigo-400" />
-              AI Agent is finding your perfect match...
-            </p>
+          
+          {/* Agent Hints */}
+          <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-white/80">
+            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">Try: "Find a quiet cafe partner"</span>
+            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">"I want to learn Tea Ceremony"</span>
+            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">"Meet a startup founder"</span>
           </div>
         </div>
 

@@ -7,9 +7,10 @@ import { Sparkles, Instagram, ShieldCheck } from "lucide-react";
 interface HostCardProps {
   host: Host;
   className?: string;
+  matchReason?: string;
 }
 
-export function HostCard({ host, className }: HostCardProps) {
+export function HostCard({ host, className, matchReason }: HostCardProps) {
   return (
     <Link 
       href={`/host/${host.id}`}
@@ -18,8 +19,19 @@ export function HostCard({ host, className }: HostCardProps) {
         className
       )}
     >
+      {/* Match Reason Banner */}
+      {matchReason && (
+        <div className="absolute top-0 left-0 right-0 z-30 bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-white/90">AI Match Reason</p>
+          <p className="text-sm font-medium text-white">{matchReason}</p>
+        </div>
+      )}
+
       {/* Price Bubble */}
-      <div className="absolute top-4 right-4 z-20 rounded-full bg-black/40 px-4 py-2 text-base font-medium text-white backdrop-blur-md border border-white/10">
+      <div className={cn(
+        "absolute top-4 right-4 z-20 rounded-full bg-black/40 px-4 py-2 text-base font-medium text-white backdrop-blur-md border border-white/10",
+        matchReason && "top-16" // Push down if banner exists
+      )}>
         ¥{host.price}/hr
       </div>
 
