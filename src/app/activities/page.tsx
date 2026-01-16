@@ -37,6 +37,8 @@ export default function ActivitiesPage() {
                 activity={activity} 
                 showHost={true}
                 hostAiVibe={host?.instagramAnalysis?.summary}
+                hostImage={host?.imageUrl}
+                hostName={host?.name}
               />
             );
           })}
