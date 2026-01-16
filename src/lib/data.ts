@@ -5,6 +5,7 @@ export interface Activity {
   type: 'Coffee' | 'Art' | 'Shopping' | 'Food' | 'Walk' | 'Other';
   description: string;
   duration: string; // e.g., "2 hours"
+  price?: number;
   imageUrl: string;
   tags?: string[];
 }
@@ -63,6 +64,7 @@ export const HOSTS: Host[] = [
         type: "Shopping",
         description: "带你云逛下北泽最隐秘的 Vintage 店铺，帮你挑选独一无二的昭和风穿搭。",
         duration: "1.5 hours",
+        price: 30,
         imageUrl: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?q=80&w=3270&auto=format&fit=crop",
         tags: ["Vintage", "Fashion", "Tokyo Style", "Shopping", "Hidden Gems", "Sustainable", "Retro", "Styling", "Culture", "Walk", "ThriftShop", "OldSchool", "Trendy", "StreetWear", "Harajuku", "Shimokitazawa", "TreasureHunt", "UniqueFinds", "EcoFriendly", "SlowFashion"]
       },
@@ -73,6 +75,7 @@ export const HOSTS: Host[] = [
         type: "Walk",
         description: "一起在世界最大的古书街散步，寻找那些被遗忘的绝版画册。",
         duration: "1 hour",
+        price: 20,
         imageUrl: "https://images.unsplash.com/photo-1526721966451-22670879f455?q=80&w=3270&auto=format&fit=crop",
         tags: ["Books", "History", "Quiet", "Culture", "Art", "Walking", "Hidden Gems", "Photography", "Relaxing", "Intellectual", "Bookworm", "RareFinds", "Literature", "Jimbocho", "OldBooks", "Reading", "Atmosphere", "Nostalgic", "Peaceful", "CityWalk"]
       }
@@ -155,6 +158,7 @@ export const HOSTS: Host[] = [
         type: "Walk",
         description: "我会带着相机走在涩谷街头，通过 Zoom 镜头教你如何捕捉瞬息万变的街头瞬间。",
         duration: "1.5 hours",
+        price: 30,
         imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=3270&auto=format&fit=crop",
         tags: ["Photography", "Street", "Shibuya", "Skills", "Urban", "Neon", "Action", "Walking", "Tutorial", "Vibe"]
       }
@@ -193,6 +197,7 @@ export const HOSTS: Host[] = [
         type: "Food",
         description: "带你逛真正的筑地场外市场，看刚刚切开的金枪鱼，教你如何挑选顶级食材。",
         duration: "1 hour",
+        price: 45,
         imageUrl: "https://images.unsplash.com/photo-1534482421-64566f976cfa?q=80&w=3270&auto=format&fit=crop",
       tags: ["Food", "Sushi", "Market", "Local", "Fresh", "Culture", "Tour", "Culinary", "Taste", "Authentic", "Tsukiji", "Seafood", "TunaAuction", "StreetFood", "Gourmet", "FoodTour", "Delicious", "JapanEats", "LocalMarket", "FoodieHeaven"]
       }

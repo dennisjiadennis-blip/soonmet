@@ -424,6 +424,65 @@ export default function BecomeHostPage() {
                         placeholder="What will you do? e.g. Just hanging out at a cafe..."
                       />
                     </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-zinc-400">Duration (Minutes)</label>
+                        <select
+                          name="activityDuration"
+                          value={formData.activityDuration}
+                          onChange={handleInputChange}
+                          onFocus={() => handleFocus('activityDuration')}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white"
+                        >
+                          <option value="30">30 Minutes</option>
+                          <option value="45">45 Minutes</option>
+                          <option value="60">60 Minutes</option>
+                          <option value="90">90 Minutes</option>
+                          <option value="120">2 Hours</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-zinc-400">Event Price ($)</label>
+                        <div className="relative">
+                          <span className="absolute left-4 top-3.5 text-zinc-500">$</span>
+                          <input 
+                            required
+                            type="number"
+                            min="0"
+                            name="activityPrice"
+                            value={formData.activityPrice}
+                            onChange={handleInputChange}
+                            onFocus={() => handleFocus('activityPrice')}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl pl-8 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                            placeholder="30"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between bg-black/20 p-4 rounded-xl border border-white/5">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${formData.zoomMeeting ? 'bg-blue-500/20 text-blue-400' : 'bg-zinc-800 text-zinc-500'}`}>
+                          <Video className="h-5 w-5" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium text-white">Online Zoom Meeting</p>
+                          <p className="text-xs text-zinc-400">Host this event virtually</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleToggleChange('zoomMeeting', !formData.zoomMeeting);
+                          handleFocus('zoomMeeting');
+                        }}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.zoomMeeting ? 'bg-indigo-500' : 'bg-zinc-700'}`}
+                      >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.zoomMeeting ? 'translate-x-6' : 'translate-x-1'}`} />
+                      </button>
+                    </div>
                   </div>
                 </div>
 

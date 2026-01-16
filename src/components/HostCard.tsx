@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Host } from "@/lib/data";
-import { Sparkles, Instagram } from "lucide-react";
+import { Sparkles, Instagram, ShieldCheck } from "lucide-react";
 
 interface HostCardProps {
   host: Host;
@@ -91,8 +91,9 @@ export function HostCard({ host, className }: HostCardProps) {
 
         {/* Bottom Content: Name & Role */}
         <div className="absolute bottom-0 left-0 w-full p-6 text-white z-20 transition-transform duration-500 group-hover:translate-y-2">
-          <div className="mb-1 text-3xl font-bold tracking-tight">
-            {host.name}
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-3xl font-bold tracking-tight">{host.name}</span>
+            <ShieldCheck className="h-5 w-5 text-blue-400" />
           </div>
           <div className="text-lg font-light opacity-90 text-indigo-200">
             {host.role}

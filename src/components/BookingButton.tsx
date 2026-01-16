@@ -20,7 +20,7 @@ export function BookingButton({ host }: BookingButtonProps) {
       >
         <div className="relative flex items-center justify-center gap-3 rounded-full bg-transparent px-8 py-4 transition-all group-hover:bg-opacity-0">
           <Video className="h-6 w-6 text-white animate-pulse" />
-          <span className="text-xl font-semibold text-white">Say Hi on Zoom</span>
+          <span className="text-xl font-semibold text-white">Book Securely on Zoom</span>
         </div>
       </button>
 

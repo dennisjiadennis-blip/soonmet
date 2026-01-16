@@ -1,3 +1,5 @@
+"use client";
+
 import { X, Calendar, Clock, CreditCard, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -123,6 +125,16 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
                 </div>
               </div>
 
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl flex items-start gap-3 border border-green-100 dark:border-green-800/50">
+                <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-semibold text-green-700 dark:text-green-300">Money Back Guarantee</h4>
+                  <p className="text-xs text-green-600/90 dark:text-green-400/90 mt-1 leading-relaxed">
+                    Book with confidence. If the meeting doesn't happen or you're not satisfied, we'll refund you 100% instantly. Funds are held securely by SoonMet until the event is complete.
+                  </p>
+                </div>
+              </div>
+
               <button 
                 onClick={handlePayment}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2"
@@ -132,7 +144,7 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
               
               <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">
                 <ShieldCheck className="h-3 w-3" />
-                Payments are secure and encrypted
+                Payments are secure and encrypted via SoonMet Secure™
               </div>
             </div>
           )}
