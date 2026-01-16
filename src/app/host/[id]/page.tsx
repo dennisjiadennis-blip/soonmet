@@ -49,7 +49,7 @@ export default async function HostPage({ params }: HostPageProps) {
             <p className="text-xl text-zinc-500 dark:text-zinc-400">{host.role}</p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">${host.price}<span className="text-lg font-normal text-zinc-500">/hr</span></div>
+            <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">¥{host.price}<span className="text-lg font-normal text-zinc-500">/hr</span></div>
           </div>
         </div>
 

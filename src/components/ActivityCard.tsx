@@ -95,7 +95,7 @@ export function ActivityCard({ activity, className, showHost = false, hostAiVibe
         <div className="flex items-center justify-between text-xs text-zinc-400">
           <span>{activity.duration}</span>
           {activity.price && (
-            <span className="font-semibold text-zinc-900 dark:text-zinc-100">${activity.price}</span>
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">¥{activity.price}</span>
           )}
         </div>
       </div>

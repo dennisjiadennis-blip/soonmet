@@ -314,17 +314,17 @@ export default function BecomeHostPage() {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Hourly Rate ($)</label>
+                      <label className="text-sm font-medium text-zinc-400">Hourly Rate (¥)</label>
                       <input 
                         required
                         type="number" 
-                        min="5"
+                        min="1000"
                         name="rate"
                         value={formData.rate}
                         onChange={handleInputChange}
                         onFocus={() => handleFocus('rate')}
                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                        placeholder="25"
+                        placeholder="4000"
                       />
                     </div>
                     <div className="space-y-2">

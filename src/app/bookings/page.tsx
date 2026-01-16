@@ -35,7 +35,7 @@ export default function BookingsPage() {
           hostImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80',
           date: 'Oct 15, 2023',
           time: '2:00 PM',
-          price: 27,
+          price: 4000,
           status: 'completed'
         },
         {
@@ -45,7 +45,7 @@ export default function BookingsPage() {
           hostImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80',
           date: 'Sep 28, 2023',
           time: '8:00 PM',
-          price: 32,
+          price: 4800,
           status: 'completed'
         }
       ];

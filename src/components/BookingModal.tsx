@@ -105,15 +105,15 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
               <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-500">Rate</span>
-                  <span className="font-medium">${host.price}.00 / hr</span>
+                  <span className="font-medium">¥{host.price} / hr</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-500">Service Fee</span>
-                  <span className="font-medium">$2.00</span>
+                  <span className="font-medium">¥300</span>
                 </div>
                 <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700 flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${host.price + 2}.00</span>
+                  <span>¥{host.price + 300}</span>
                 </div>
               </div>
 
@@ -139,7 +139,7 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
                 onClick={handlePayment}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2"
               >
-                Pay ${host.price + 2}.00
+                Pay ¥{host.price + 300}
               </button>
               
               <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">

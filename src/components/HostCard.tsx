@@ -20,7 +20,7 @@ export function HostCard({ host, className }: HostCardProps) {
     >
       {/* Price Bubble */}
       <div className="absolute top-4 right-4 z-20 rounded-full bg-black/40 px-4 py-2 text-base font-medium text-white backdrop-blur-md border border-white/10">
-        ${host.price}/hr
+        ¥{host.price}/hr
       </div>
 
       {/* AI & Lifestyle Badge - Large & Bold Overlay */}
