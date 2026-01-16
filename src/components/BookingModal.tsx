@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Calendar, Clock, CreditCard, ShieldCheck } from "lucide-react";
+import { X, Calendar, CreditCard, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Host } from "@/lib/data";
@@ -104,8 +104,8 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
             <div className="space-y-6">
               <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Rate</span>
-                  <span className="font-medium">¥{host.price} / hr</span>
+                  <span className="text-zinc-500">Connection Fee</span>
+                  <span className="font-medium">¥{host.price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-500">Service Fee</span>
@@ -130,7 +130,7 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
                 <div>
                   <h4 className="text-sm font-semibold text-green-700 dark:text-green-300">Money Back Guarantee</h4>
                   <p className="text-xs text-green-600/90 dark:text-green-400/90 mt-1 leading-relaxed">
-                    Book with confidence. If the meeting doesn't happen or you're not satisfied, we'll refund you 100% instantly. Funds are held securely by SoonMet until the event is complete.
+                    Book with confidence. If the meeting doesn&apos;t happen or you&apos;re not satisfied, we&apos;ll refund you 100% instantly. Funds are held securely by SoonMet until the event is complete.
                   </p>
                 </div>
               </div>

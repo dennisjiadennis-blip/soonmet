@@ -22,7 +22,7 @@ const TYPE_ICONS = {
   Other: MapPin,
 };
 
-export function ActivityCard({ activity, className, showHost = false, hostAiVibe, hostImage, hostName }: ActivityCardProps) {
+export function ActivityCard({ activity, className, hostAiVibe }: ActivityCardProps) {
   const Icon = TYPE_ICONS[activity.type] || MapPin;
 
   return (
@@ -48,8 +48,8 @@ export function ActivityCard({ activity, className, showHost = false, hostAiVibe
           {activity.type}
         </div>
         
-        {/* Host Avatar Overlay - Emphasizing WHO */}
-        {showHost && hostImage && (
+        {/* Host Avatar Overlay - Removed as per user request to reduce commercial feel */}
+        {/* {showHost && hostImage && (
           <div className="absolute bottom-3 left-3 z-20 flex items-center gap-2">
              <div className="relative h-10 w-10 rounded-full border-2 border-white shadow-lg overflow-hidden">
                 <Image src={hostImage} alt={hostName || "Host"} fill className="object-cover" />
@@ -59,7 +59,7 @@ export function ActivityCard({ activity, className, showHost = false, hostAiVibe
                 <span className="text-sm font-bold leading-tight">{hostName}</span>
              </div>
           </div>
-        )}
+        )} */}
 
         {/* AI Vibe */}
         {hostAiVibe && (

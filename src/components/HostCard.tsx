@@ -27,13 +27,13 @@ export function HostCard({ host, className, matchReason }: HostCardProps) {
         </div>
       )}
 
-      {/* Price Bubble */}
-      <div className={cn(
+      {/* Price Bubble - Removed to reduce commercial feel */}
+      {/* <div className={cn(
         "absolute top-4 right-4 z-20 rounded-full bg-black/40 px-4 py-2 text-base font-medium text-white backdrop-blur-md border border-white/10",
         matchReason && "top-16" // Push down if banner exists
       )}>
         ¥{host.price}/hr
-      </div>
+      </div> */}
 
       {/* AI & Lifestyle Badge - Large & Bold Overlay */}
       {host.instagramAnalysis && (

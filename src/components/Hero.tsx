@@ -14,7 +14,7 @@ export function Hero() {
 
   // Typewriter effect for placeholder
   useEffect(() => {
-    const text = "Tell me what you're looking for... e.g. 'I want to host travelers' or 'Find a coffee buddy'";
+    const text = "Describe your ideal meeting... e.g. 'I want to share a quiet afternoon with a book lover'";
     let i = 0;
     const interval = setInterval(() => {
       setPlaceholder(text.slice(0, i));
@@ -78,7 +78,7 @@ export function Hero() {
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
-          backgroundImage: 'url("https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2994&auto=format&fit=crop")',
+          backgroundImage: 'url("https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?q=80&w=3270&auto=format&fit=crop")',
         }}
       >
         {/* Overlay for text readability */}
@@ -87,14 +87,26 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
-        <h1 className="mb-8 text-4xl font-light tracking-wide md:text-6xl drop-shadow-lg">
-          In Tokyo, you have a friend <br className="hidden md:block" />
-          you haven&apos;t met yet.
+        <h1 className="mb-4 text-4xl font-light tracking-wide md:text-6xl drop-shadow-lg">
+          People Tourism, <br className="hidden md:block" />
+          Not Scenery Tourism
         </h1>
         
-        <p className="mb-12 text-lg font-light opacity-90 md:text-xl">
-          在东京，你有一个尚未谋面的朋友。
+        <p className="mb-6 text-xl font-light md:text-2xl opacity-95">
+          我们在做的是人的旅游，而不是景色的旅游
         </p>
+
+        <div className="mb-12 max-w-2xl mx-auto space-y-4 opacity-90 text-sm md:text-base font-light leading-relaxed">
+          <p>
+            Tourism is an exploration of humanity, not just consumption. 
+            It is about understanding and embracing foreign cultures and human emotions, 
+            not just viewing from afar out of curiosity.
+          </p>
+          <p className="text-zinc-200">
+            连接人与人的乐趣，旅游是对人文的探索，而不是仅仅的是消费。
+            是对异国文化和人类情感的理解和拥抱，而不是因为好奇而远观。
+          </p>
+        </div>
 
         {/* AI Agent Interface */}
         <div className="relative w-full max-w-3xl group mx-auto">
@@ -134,9 +146,7 @@ export function Hero() {
           
           {/* Agent Hints */}
           <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-white/80">
-            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">Try: "Find a quiet cafe partner"</span>
-            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">"I want to learn Tea Ceremony"</span>
-            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">"Meet a startup founder"</span>
+            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">Try: "Find a local foodie to explore hidden gems"</span>
           </div>
         </div>
 

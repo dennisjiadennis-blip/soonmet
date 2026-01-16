@@ -35,10 +35,7 @@ export default function ActivitiesPage() {
               <ActivityCard 
                 key={activity.id} 
                 activity={activity} 
-                showHost={true}
                 hostAiVibe={host?.instagramAnalysis?.summary}
-                hostImage={host?.imageUrl}
-                hostName={host?.name}
               />
             );
           })}

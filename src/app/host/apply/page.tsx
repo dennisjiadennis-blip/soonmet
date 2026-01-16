@@ -581,7 +581,7 @@ export default function BecomeHostPage() {
                        <span className="text-xs text-zinc-500">2m ago</span>
                      </div>
                      <p className="text-xs text-zinc-400">
-                       You have <span className="text-green-400 font-bold">$45.00</span> ready to collect from yesterday&apos;s session.
+                       You have <span className="text-green-400 font-bold">¥6,750</span> ready to collect from yesterday&apos;s session.
                      </p>
                      <button className="mt-2 w-full flex items-center justify-center gap-2 py-1.5 bg-green-600/20 hover:bg-green-600/30 border border-green-600/30 rounded-lg text-xs font-medium text-green-400 transition-colors">
                         Collect Money <ArrowRight className="h-3 w-3" />

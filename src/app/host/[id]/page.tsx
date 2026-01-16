@@ -124,7 +124,7 @@ export default async function HostPage({ params }: HostPageProps) {
             
             <div className="mt-3 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
               <ShieldCheck className="h-4 w-4 text-green-500" />
-              <span>100% Secure. Full refund if meeting doesn't happen.</span>
+              <span>100% Secure. Full refund if meeting doesn&apos;t happen.</span>
             </div>
           </div>
         </div>
