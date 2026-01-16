@@ -137,7 +137,7 @@ export function Hero() {
                 </>
               ) : (
                 <>
-                  <span>Ask AI</span>
+                  <span>Make it Happen</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
