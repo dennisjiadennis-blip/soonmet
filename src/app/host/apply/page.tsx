@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, MapPin, DollarSign, User, CheckCircle, Instagram, Sparkles, MessageSquare, Video, Wallet, ArrowRight, Coffee, ShoppingBag, Utensils, Footprints } from "lucide-react";
+import { Camera, MapPin, DollarSign, User, CheckCircle, Instagram, Sparkles, MessageSquare, Video, Wallet, ArrowRight, Coffee, ShoppingBag, Utensils, Footprints, FileText, Shield } from "lucide-react";
 
 export default function BecomeHostPage() {
   const router = useRouter();
@@ -136,9 +136,9 @@ export default function BecomeHostPage() {
         };
       case 'activityDesc':
         return {
-          title: "Describe the vibe",
-          content: "Just be yourself. Explain what you'll do together in 1-2 sentences.",
-          suggestion: "Example: 'I'll take you to my favorite quiet cafe where we can work or study together for an hour. Good wifi and great matcha!'"
+          title: "Set the Vibe",
+          content: "Focus on the feeling. Is it cozy? Energetic? Deep? People buy feelings, not just time.",
+          suggestion: "Try starting with: 'Imagine us...' or 'We will share...'"
         };
       default:
         return {
@@ -420,16 +420,21 @@ export default function BecomeHostPage() {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-zinc-400">Description</label>
-                      <textarea 
-                        required
-                        rows={3}
-                        name="activityDesc"
-                        value={formData.activityDesc}
-                        onChange={handleInputChange}
-                        onFocus={() => handleFocus('activityDesc')}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                        placeholder="What will you do? e.g. Just hanging out at a cafe..."
-                      />
+                      <div className="relative">
+                        <textarea 
+                          required
+                          rows={3}
+                          name="activityDesc"
+                          value={formData.activityDesc}
+                          onChange={handleInputChange}
+                          onFocus={() => handleFocus('activityDesc')}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                          placeholder="Describe the moment, not the itinerary. e.g. 'We'll sit by the window, watch the rain, and talk about our favorite books...'"
+                        />
+                        <div className="absolute bottom-3 right-3">
+                           <Sparkles className="h-4 w-4 text-white/20" />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -8,6 +8,7 @@ export interface Activity {
   price?: number;
   imageUrl: string;
   tags?: string[];
+  status?: 'draft' | 'pending' | 'active' | 'rejected';
 }
 
 export interface Host {
@@ -21,6 +22,7 @@ export interface Host {
   quirks: string[];
   photos: string[];
   activities: Activity[];
+  verificationStatus?: 'unverified' | 'pending' | 'verified' | 'rejected';
   instagramAnalysis?: {
     summary: string;
     vibeTags: string[];
@@ -66,7 +68,8 @@ export const HOSTS: Host[] = [
         duration: "1.5 hours",
         price: 2500,
         imageUrl: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?q=80&w=3270&auto=format&fit=crop",
-        tags: ["Vintage", "Fashion", "Tokyo Style", "Shopping", "Hidden Gems", "Sustainable", "Retro", "Styling", "Culture", "Walk", "ThriftShop", "OldSchool", "Trendy", "StreetWear", "Harajuku", "Shimokitazawa", "TreasureHunt", "UniqueFinds", "EcoFriendly", "SlowFashion"]
+        tags: ["Vintage", "Fashion", "Tokyo Style", "Shopping", "Hidden Gems", "Sustainable", "Retro", "Styling", "Culture", "Walk", "ThriftShop", "OldSchool", "Trendy", "StreetWear", "Harajuku", "Shimokitazawa", "TreasureHunt", "UniqueFinds", "EcoFriendly", "SlowFashion"],
+        status: 'active'
       },
       {
         id: "a2",

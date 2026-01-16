@@ -151,6 +151,22 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Verification Status */}
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                 <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                       <ShieldCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                       <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Identity Verified</h3>
+                       <p className="text-zinc-500 text-sm">Your ID and background check have been completed. You are authorized to host.</p>
+                    </div>
+                 </div>
+                 <button className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 whitespace-nowrap">
+                    View Certificate
+                 </button>
+              </div>
+
               {/* Host Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">

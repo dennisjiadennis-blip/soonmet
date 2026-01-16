@@ -108,7 +108,7 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
                   <span className="font-medium">¥{host.price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Service Fee</span>
+                  <span className="text-zinc-500">Platform & AI Fee</span>
                   <span className="font-medium">¥300</span>
                 </div>
                 <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700 flex justify-between text-lg font-bold">
@@ -117,11 +117,48 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700">
-                <CreditCard className="h-6 w-6 text-zinc-400" />
-                <div className="flex-1">
-                  <div className="font-medium">•••• •••• •••• 4242</div>
-                  <div className="text-xs text-zinc-500">Expires 12/25</div>
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-zinc-500">Payment Method</label>
+                <div className="grid gap-3">
+                  <div className="flex items-center gap-3 p-4 rounded-xl border border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-900/10 cursor-pointer">
+                    <div className="h-5 w-5 rounded-full border-[5px] border-indigo-500 bg-white"></div>
+                    <div className="flex-1 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <CreditCard className="h-5 w-5 text-indigo-500" />
+                        <span className="font-medium">Credit Card</span>
+                      </div>
+                      <div className="flex gap-2">
+                         {/* Mock Visa/Mastercard Icons */}
+                         <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-700 rounded flex items-center justify-center text-[10px] font-bold text-zinc-500">VISA</div>
+                         <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-700 rounded flex items-center justify-center text-[10px] font-bold text-zinc-500">MC</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Card Input Mock */}
+                <div className="space-y-3 pt-2">
+                   <div className="relative">
+                      <CreditCard className="absolute left-3 top-3.5 h-4 w-4 text-zinc-400" />
+                      <input 
+                        type="text" 
+                        placeholder="Card number" 
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
+                        defaultValue="4242 4242 4242 4242"
+                      />
+                   </div>
+                   <div className="grid grid-cols-2 gap-3">
+                      <input 
+                        type="text" 
+                        placeholder="MM / YY" 
+                        className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="CVC" 
+                        className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
+                      />
+                   </div>
                 </div>
               </div>
 
