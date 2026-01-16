@@ -34,7 +34,8 @@ export default function BecomeHostPage() {
     activityDesc: "",
     activityDuration: "60",
     activityPrice: "",
-    zoomMeeting: false
+    zoomMeeting: false,
+    idType: "driver_license"
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -367,6 +368,57 @@ export default function BecomeHostPage() {
                       </div>
                       <input type="file" className="hidden" />
                     </label>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-indigo-400" />
+                    Identity Verification
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-400">Document Type</label>
+                      <select 
+                        name="idType"
+                        value={formData.idType}
+                        onChange={handleInputChange}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white"
+                      >
+                        <option value="driver_license">Driver&apos;s License (運転免許証)</option>
+                        <option value="mynumber">My Number Card (マイナンバーカード)</option>
+                        <option value="residence_card">Residence Card (在留カード)</option>
+                        <option value="passport">Passport (パスポート)</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-400">Upload Document Image</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex items-center justify-center w-full">
+                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors">
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                              <FileText className="h-8 w-8 text-zinc-400 mb-2" />
+                              <p className="text-sm text-zinc-400">Front Side (表面)</p>
+                              <p className="text-xs text-zinc-500 mt-1">Click to upload</p>
+                            </div>
+                            <input type="file" className="hidden" accept=".jpg,.png,.pdf" />
+                          </label>
+                        </div>
+                        <div className="flex items-center justify-center w-full">
+                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors">
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                              <FileText className="h-8 w-8 text-zinc-400 mb-2" />
+                              <p className="text-sm text-zinc-400">Back Side (裏面)</p>
+                              <p className="text-xs text-zinc-500 mt-1">Click to upload</p>
+                            </div>
+                            <input type="file" className="hidden" accept=".jpg,.png,.pdf" />
+                          </label>
+                        </div>
+                      </div>
+                      <p className="text-xs text-zinc-500">We will verify your identity to ensure the safety of our community. Your ID will be encrypted and stored securely.</p>
+                    </div>
                   </div>
                 </div>
 
