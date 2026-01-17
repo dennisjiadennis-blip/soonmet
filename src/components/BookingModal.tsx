@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Calendar, CreditCard, ShieldCheck } from "lucide-react";
+import { X, Calendar, CreditCard, ShieldCheck, Heart, MessageCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Host } from "@/lib/data";
@@ -12,7 +12,7 @@ interface BookingModalProps {
 }
 
 export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
-  const [step, setStep] = useState<'date' | 'payment' | 'processing'>('date');
+  const [step, setStep] = useState<'date' | 'manifesto' | 'payment' | 'processing'>('date');
   const router = useRouter();
 
   if (!isOpen) return null;
@@ -91,12 +91,59 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
 
               <div className="pt-4">
                 <button 
-                  onClick={() => setStep('payment')}
+                  onClick={() => setStep('manifesto')}
                   className="w-full py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold text-lg hover:opacity-90 transition-opacity"
                 >
-                  Continue to Payment
+                  Continue
                 </button>
               </div>
+            </div>
+          )}
+
+          {step === 'manifesto' && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-300">
+              <div className="text-center space-y-4">
+                <div className="mx-auto h-16 w-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <Heart className="h-8 w-8 text-indigo-500" />
+                </div>
+                <h3 className="text-2xl font-bold">More than just a booking</h3>
+                <p className="text-zinc-500 leading-relaxed">
+                  You&apos;re not just buying a service—you&apos;re connecting with a real person and sharing a slice of their life.
+                </p>
+              </div>
+
+              <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 space-y-4 border border-zinc-100 dark:border-zinc-700">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <MessageCircle className="h-6 w-6 text-green-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">Open Connection Policy</h4>
+                    <p className="text-sm text-zinc-500 mt-1">
+                      We want you to build real friendships. Feel free to exchange LINE, WhatsApp, or Instagram after you connect.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <Sparkles className="h-6 w-6 text-amber-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">One-Time Fee</h4>
+                    <p className="text-sm text-zinc-500 mt-1">
+                      The fee covers this initial connection and supports the platform. We don&apos;t charge for your future interactions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setStep('payment')}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
+              >
+                I Understand, Let&apos;s Connect
+              </button>
             </div>
           )}
 
