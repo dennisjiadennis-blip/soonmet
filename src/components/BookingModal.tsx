@@ -136,6 +136,18 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
                     </p>
                   </div>
                 </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <ShieldCheck className="h-6 w-6 text-indigo-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">Connection Guarantee</h4>
+                    <p className="text-sm text-zinc-500 mt-1">
+                      If the Zoom call doesn&apos;t happen or connection fails, you get a 100% refund instantly.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <button 
@@ -212,9 +224,9 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl flex items-start gap-3 border border-green-100 dark:border-green-800/50">
                 <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-semibold text-green-700 dark:text-green-300">Money Back Guarantee</h4>
+                  <h4 className="text-sm font-semibold text-green-700 dark:text-green-300">Connection Guarantee</h4>
                   <p className="text-xs text-green-600/90 dark:text-green-400/90 mt-1 leading-relaxed">
-                    Book with confidence. If the meeting doesn&apos;t happen or you&apos;re not satisfied, we&apos;ll refund you 100% instantly. Funds are held securely by SoonMet until the event is complete.
+                    If the Zoom meeting fails or doesn&apos;t happen, we&apos;ll refund you 100% instantly. Funds are held securely until the event is complete.
                   </p>
                 </div>
               </div>
