@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Calendar, CreditCard, ShieldCheck, Heart, MessageCircle, Sparkles } from "lucide-react";
+import { X, Calendar, Clock, CreditCard, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Host } from "@/lib/data";
@@ -12,7 +12,7 @@ interface BookingModalProps {
 }
 
 export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
-  const [step, setStep] = useState<'date' | 'manifesto' | 'payment' | 'processing'>('date');
+  const [step, setStep] = useState<'date' | 'payment' | 'processing'>('date');
   const router = useRouter();
 
   if (!isOpen) return null;
@@ -91,71 +91,12 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
 
               <div className="pt-4">
                 <button 
-                  onClick={() => setStep('manifesto')}
+                  onClick={() => setStep('payment')}
                   className="w-full py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold text-lg hover:opacity-90 transition-opacity"
                 >
-                  Continue
+                  Continue to Payment
                 </button>
               </div>
-            </div>
-          )}
-
-          {step === 'manifesto' && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-300">
-              <div className="text-center space-y-4">
-                <div className="mx-auto h-16 w-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
-                  <Heart className="h-8 w-8 text-indigo-500" />
-                </div>
-                <h3 className="text-2xl font-bold">More than just a booking</h3>
-                <p className="text-zinc-500 leading-relaxed">
-                  You&apos;re not just buying a service—you&apos;re connecting with a real person and sharing a slice of their life.
-                </p>
-              </div>
-
-              <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 space-y-4 border border-zinc-100 dark:border-zinc-700">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <MessageCircle className="h-6 w-6 text-green-500" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">Open Connection Policy</h4>
-                    <p className="text-sm text-zinc-500 mt-1">
-                      We want you to build real friendships. Feel free to exchange LINE, WhatsApp, or Instagram after you connect.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <Sparkles className="h-6 w-6 text-amber-500" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">One-Time Fee</h4>
-                    <p className="text-sm text-zinc-500 mt-1">
-                      The fee covers this initial connection and supports the platform. We don&apos;t charge for your future interactions.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <ShieldCheck className="h-6 w-6 text-indigo-500" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">Connection Guarantee</h4>
-                    <p className="text-sm text-zinc-500 mt-1">
-                      If the Zoom call doesn&apos;t happen or connection fails, you get a 100% refund instantly.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button 
-                onClick={() => setStep('payment')}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
-              >
-                I Understand, Let&apos;s Connect
-              </button>
             </div>
           )}
 
@@ -163,70 +104,33 @@ export function BookingModal({ host, isOpen, onClose }: BookingModalProps) {
             <div className="space-y-6">
               <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Connection Fee</span>
-                  <span className="font-medium">¥{host.price}</span>
+                  <span className="text-zinc-500">Rate</span>
+                  <span className="font-medium">${host.price}.00 / hr</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Platform & AI Fee</span>
-                  <span className="font-medium">¥300</span>
+                  <span className="text-zinc-500">Service Fee</span>
+                  <span className="font-medium">$2.00</span>
                 </div>
                 <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700 flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>¥{host.price + 300}</span>
+                  <span>${host.price + 2}.00</span>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <label className="text-sm font-medium text-zinc-500">Payment Method</label>
-                <div className="grid gap-3">
-                  <div className="flex items-center gap-3 p-4 rounded-xl border border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-900/10 cursor-pointer">
-                    <div className="h-5 w-5 rounded-full border-[5px] border-indigo-500 bg-white"></div>
-                    <div className="flex-1 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <CreditCard className="h-5 w-5 text-indigo-500" />
-                        <span className="font-medium">Credit Card</span>
-                      </div>
-                      <div className="flex gap-2">
-                         {/* Mock Visa/Mastercard Icons */}
-                         <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-700 rounded flex items-center justify-center text-[10px] font-bold text-zinc-500">VISA</div>
-                         <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-700 rounded flex items-center justify-center text-[10px] font-bold text-zinc-500">MC</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Card Input Mock */}
-                <div className="space-y-3 pt-2">
-                   <div className="relative">
-                      <CreditCard className="absolute left-3 top-3.5 h-4 w-4 text-zinc-400" />
-                      <input 
-                        type="text" 
-                        placeholder="Card number" 
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
-                        defaultValue="4242 4242 4242 4242"
-                      />
-                   </div>
-                   <div className="grid grid-cols-2 gap-3">
-                      <input 
-                        type="text" 
-                        placeholder="MM / YY" 
-                        className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="CVC" 
-                        className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
-                      />
-                   </div>
+              <div className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                <CreditCard className="h-6 w-6 text-zinc-400" />
+                <div className="flex-1">
+                  <div className="font-medium">•••• •••• •••• 4242</div>
+                  <div className="text-xs text-zinc-500">Expires 12/25</div>
                 </div>
               </div>
 
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl flex items-start gap-3 border border-green-100 dark:border-green-800/50">
                 <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-semibold text-green-700 dark:text-green-300">Connection Guarantee</h4>
+                  <h4 className="text-sm font-semibold text-green-700 dark:text-green-300">Money Back Guarantee</h4>
                   <p className="text-xs text-green-600/90 dark:text-green-400/90 mt-1 leading-relaxed">
-                    If the Zoom meeting fails or doesn&apos;t happen, we&apos;ll refund you 100% instantly. Funds are held securely until the event is complete.
+                    Book with confidence. If the meeting doesn't happen or you're not satisfied, we'll refund you 100% instantly. Funds are held securely by SoonMet until the event is complete.
                   </p>
                 </div>
               </div>

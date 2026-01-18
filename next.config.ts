@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'tmp-file-server-79040334887.us-central1.run.app',
+      },
     ],
   },
 };

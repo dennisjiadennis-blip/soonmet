@@ -9,8 +9,6 @@ interface ActivityCardProps {
   className?: string;
   showHost?: boolean;
   hostAiVibe?: string;
-  hostImage?: string;
-  hostName?: string;
 }
 
 const TYPE_ICONS = {
@@ -22,7 +20,7 @@ const TYPE_ICONS = {
   Other: MapPin,
 };
 
-export function ActivityCard({ activity, className, hostAiVibe }: ActivityCardProps) {
+export function ActivityCard({ activity, className, showHost = false, hostAiVibe }: ActivityCardProps) {
   const Icon = TYPE_ICONS[activity.type] || MapPin;
 
   return (
@@ -48,19 +46,6 @@ export function ActivityCard({ activity, className, hostAiVibe }: ActivityCardPr
           {activity.type}
         </div>
         
-        {/* Host Avatar Overlay - Removed as per user request to reduce commercial feel */}
-        {/* {showHost && hostImage && (
-          <div className="absolute bottom-3 left-3 z-20 flex items-center gap-2">
-             <div className="relative h-10 w-10 rounded-full border-2 border-white shadow-lg overflow-hidden">
-                <Image src={hostImage} alt={hostName || "Host"} fill className="object-cover" />
-             </div>
-             <div className="flex flex-col text-white drop-shadow-md">
-                <span className="text-[10px] uppercase opacity-80 leading-none">Hosted by</span>
-                <span className="text-sm font-bold leading-tight">{hostName}</span>
-             </div>
-          </div>
-        )} */}
-
         {/* AI Vibe */}
         {hostAiVibe && (
           <div className="absolute top-3 right-3 max-w-[60%] z-20">

@@ -10,6 +10,12 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeTab = searchParams.get("tab") === "hosting" ? "hosting" : "traveling";
+  const [bookings, setBookings] = useState<any[]>([]);
+
+  useEffect(() => {
+    const savedBookings = JSON.parse(localStorage.getItem('soonmet_bookings') || '[]');
+    setBookings(savedBookings);
+  }, []);
 
   const handleTabChange = (tab: string) => {
     router.push(`/dashboard?tab=${tab}`, { scroll: false });
@@ -95,38 +101,51 @@ function DashboardContent() {
               {/* Upcoming Trips */}
               <section>
                 <h2 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-zinc-100">Upcoming Trips</h2>
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
-                  <div className="flex gap-6">
-                    <div className="relative h-32 w-48 shrink-0 rounded-xl overflow-hidden hidden sm:block">
-                      <Image 
-                        src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=3270&auto=format&fit=crop"
-                        alt="Trip"
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <span className="text-xs font-bold text-indigo-500 uppercase tracking-wider">Tomorrow</span>
-                          <h3 className="text-lg font-bold mt-1 group-hover:text-indigo-500 transition-colors">Coffee with Saki in Shibuya</h3>
-                          <p className="text-zinc-500 text-sm mt-1">Jan 24, 10:00 AM - 11:30 AM</p>
-                        </div>
-                        <div className="bg-indigo-50 dark:bg-indigo-500/10 p-2 rounded-full">
-                          <Coffee className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                        </div>
+                
+                {bookings.length === 0 && (
+                  <div className="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-200 dark:border-zinc-800 text-center text-zinc-500">
+                    <p>No upcoming trips yet.</p>
+                    <Link href="/activities" className="text-indigo-600 font-medium mt-2 inline-block">Explore experiences</Link>
+                  </div>
+                )}
+
+                {bookings.map((booking) => (
+                  <div key={booking.id} className="mb-4 bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                    <div className="flex gap-6">
+                      <div className="relative h-32 w-48 shrink-0 rounded-xl overflow-hidden hidden sm:block">
+                        <Image 
+                          src={booking.hostImage}
+                          alt="Trip"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
                       </div>
-                      <div className="mt-4 flex items-center gap-4">
-                        <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
-                          Join Zoom Meeting
-                        </button>
-                        <button className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300">
-                          Message Host
-                        </button>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="text-xs font-bold text-indigo-500 uppercase tracking-wider">{booking.date}</span>
+                            <h3 className="text-lg font-bold mt-1 group-hover:text-indigo-500 transition-colors">Meeting with {booking.hostName}</h3>
+                            <p className="text-zinc-500 text-sm mt-1">{booking.time} - Zoom</p>
+                          </div>
+                          <div className="bg-indigo-50 dark:bg-indigo-500/10 p-2 rounded-full">
+                            <Coffee className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                        </div>
+                        <div className="mt-4 flex items-center gap-4">
+                          <button 
+                            onClick={() => router.push(`/meeting/${booking.hostId}`)}
+                            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                          >
+                            Join Zoom Meeting
+                          </button>
+                          <button className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300">
+                            Message Host
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </section>
 
               {/* Saved */}
@@ -142,7 +161,7 @@ function DashboardContent() {
                       </div>
                       <div className="p-4">
                         <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">Hidden Jazz Bars</h4>
-                        <p className="text-sm text-zinc-500">Shinjuku • ¥6,000</p>
+                        <p className="text-sm text-zinc-500">Shinjuku • $45</p>
                       </div>
                     </div>
                   ))}
@@ -151,22 +170,6 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* Verification Status */}
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                 <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
-                       <ShieldCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                       <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Identity Verified</h3>
-                       <p className="text-zinc-500 text-sm">Your ID and background check have been completed. You are authorized to host.</p>
-                    </div>
-                 </div>
-                 <button className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 whitespace-nowrap">
-                    View Certificate
-                 </button>
-              </div>
-
               {/* Host Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">

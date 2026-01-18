@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, MapPin, DollarSign, User, CheckCircle, Instagram, Sparkles, MessageSquare, Video, Wallet, ArrowRight, Coffee, ShoppingBag, Utensils, Footprints, FileText, Shield } from "lucide-react";
+import { Camera, MapPin, DollarSign, User, CheckCircle, Instagram, Sparkles, MessageSquare, Video, Wallet, ArrowRight, Coffee, ShoppingBag, Utensils, Footprints } from "lucide-react";
 
 export default function BecomeHostPage() {
   const router = useRouter();
@@ -31,19 +31,11 @@ export default function BecomeHostPage() {
     location: "",
     activityTitle: "",
     activityType: "Coffee",
-    activityDesc: "",
-    activityDuration: "60",
-    activityPrice: "",
-    zoomMeeting: false,
-    idType: "driver_license"
+    activityDesc: ""
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleToggleChange = (name: string, value: boolean) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -137,9 +129,9 @@ export default function BecomeHostPage() {
         };
       case 'activityDesc':
         return {
-          title: "Set the Vibe",
-          content: "Focus on the feeling. Is it cozy? Energetic? Deep? People buy feelings, not just time.",
-          suggestion: "Try starting with: 'Imagine us...' or 'We will share...'"
+          title: "Describe the vibe",
+          content: "Just be yourself. Explain what you'll do together in 1-2 sentences.",
+          suggestion: "Example: 'I'll take you to my favorite quiet cafe where we can work or study together for an hour. Good wifi and great matcha!'"
         };
       default:
         return {
@@ -373,57 +365,6 @@ export default function BecomeHostPage() {
 
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-indigo-400" />
-                    Identity Verification
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Document Type</label>
-                      <select 
-                        name="idType"
-                        value={formData.idType}
-                        onChange={handleInputChange}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white"
-                      >
-                        <option value="driver_license">Driver&apos;s License (運転免許証)</option>
-                        <option value="mynumber">My Number Card (マイナンバーカード)</option>
-                        <option value="residence_card">Residence Card (在留カード)</option>
-                        <option value="passport">Passport (パスポート)</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Upload Document Image</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex items-center justify-center w-full">
-                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <FileText className="h-8 w-8 text-zinc-400 mb-2" />
-                              <p className="text-sm text-zinc-400">Front Side (表面)</p>
-                              <p className="text-xs text-zinc-500 mt-1">Click to upload</p>
-                            </div>
-                            <input type="file" className="hidden" accept=".jpg,.png,.pdf" />
-                          </label>
-                        </div>
-                        <div className="flex items-center justify-center w-full">
-                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <FileText className="h-8 w-8 text-zinc-400 mb-2" />
-                              <p className="text-sm text-zinc-400">Back Side (裏面)</p>
-                              <p className="text-xs text-zinc-500 mt-1">Click to upload</p>
-                            </div>
-                            <input type="file" className="hidden" accept=".jpg,.png,.pdf" />
-                          </label>
-                        </div>
-                      </div>
-                      <p className="text-xs text-zinc-500">We will verify your identity to ensure the safety of our community. Your ID will be encrypted and stored securely.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-indigo-400" />
                     First &quot;Things Locals Know&quot; Event
                   </h3>
@@ -472,21 +413,16 @@ export default function BecomeHostPage() {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-zinc-400">Description</label>
-                      <div className="relative">
-                        <textarea 
-                          required
-                          rows={3}
-                          name="activityDesc"
-                          value={formData.activityDesc}
-                          onChange={handleInputChange}
-                          onFocus={() => handleFocus('activityDesc')}
-                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                          placeholder="Describe the moment, not the itinerary. e.g. 'We'll sit by the window, watch the rain, and talk about our favorite books...'"
-                        />
-                        <div className="absolute bottom-3 right-3">
-                           <Sparkles className="h-4 w-4 text-white/20" />
-                        </div>
-                      </div>
+                      <textarea 
+                        required
+                        rows={3}
+                        name="activityDesc"
+                        value={formData.activityDesc}
+                        onChange={handleInputChange}
+                        onFocus={() => handleFocus('activityDesc')}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                        placeholder="What will you do? e.g. Just hanging out at a cafe..."
+                      />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -508,9 +444,9 @@ export default function BecomeHostPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Event Price (¥)</label>
+                        <label className="text-sm font-medium text-zinc-400">Event Price ($)</label>
                         <div className="relative">
-                          <span className="absolute left-4 top-3.5 text-zinc-500">¥</span>
+                          <span className="absolute left-4 top-3.5 text-zinc-500">$</span>
                           <input 
                             required
                             type="number"
@@ -520,7 +456,7 @@ export default function BecomeHostPage() {
                             onChange={handleInputChange}
                             onFocus={() => handleFocus('activityPrice')}
                             className="w-full bg-black/40 border border-white/10 rounded-xl pl-8 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                            placeholder="3000"
+                            placeholder="30"
                           />
                         </div>
                       </div>
@@ -638,7 +574,7 @@ export default function BecomeHostPage() {
                        <span className="text-xs text-zinc-500">2m ago</span>
                      </div>
                      <p className="text-xs text-zinc-400">
-                       You have <span className="text-green-400 font-bold">¥6,750</span> ready to collect from yesterday&apos;s session.
+                       You have <span className="text-green-400 font-bold">$45.00</span> ready to collect from yesterday&apos;s session.
                      </p>
                      <button className="mt-2 w-full flex items-center justify-center gap-2 py-1.5 bg-green-600/20 hover:bg-green-600/30 border border-green-600/30 rounded-lg text-xs font-medium text-green-400 transition-colors">
                         Collect Money <ArrowRight className="h-3 w-3" />

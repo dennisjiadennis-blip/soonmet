@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SoonMet - People Tourism, Not Scenery",
-  description: "Tourism is an exploration of humanity. Connect with people, understand culture, and embrace emotions.",
+  title: "SoonMet - Connect with Local Hosts",
+  description: "Experience Japan with locals",
 };
 
 export default function RootLayout({

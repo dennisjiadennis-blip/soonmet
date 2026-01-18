@@ -14,7 +14,7 @@ export function Hero() {
 
   // Typewriter effect for placeholder
   useEffect(() => {
-    const text = "Describe your ideal meeting... e.g. 'I want to share a quiet afternoon with a book lover'";
+    const text = "Tell me what you're looking for... e.g. 'I want to host travelers' or 'Find a coffee buddy'";
     let i = 0;
     const interval = setInterval(() => {
       setPlaceholder(text.slice(0, i));
@@ -78,7 +78,7 @@ export function Hero() {
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
-          backgroundImage: 'url("https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?q=80&w=3270&auto=format&fit=crop")',
+          backgroundImage: 'url("https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2994&auto=format&fit=crop")',
         }}
       >
         {/* Overlay for text readability */}
@@ -87,34 +87,35 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
-        <h1 className="mb-4 text-4xl font-light tracking-wide md:text-6xl drop-shadow-lg">
-          People Tourism, <br className="hidden md:block" />
-          Not Scenery Tourism
+        <h1 className="mb-8 text-4xl font-light tracking-wide md:text-6xl drop-shadow-lg">
+          In Tokyo, you have a friend <br className="hidden md:block" />
+          you haven&apos;t met yet.
         </h1>
         
-        <p className="mb-6 text-xl font-light md:text-2xl opacity-95">
-          我们在做的是人的旅游，而不是景色的旅游
+        <p className="mb-12 text-lg font-light opacity-90 md:text-xl">
+          在东京，你有一个尚未谋面的朋友。
         </p>
-
-        <div className="mb-12 max-w-2xl mx-auto space-y-4 opacity-90 text-sm md:text-base font-light leading-relaxed">
-          <p>
-            Tourism is an exploration of humanity, not just consumption. 
-            It is about understanding and embracing foreign cultures and human emotions, 
-            not just viewing from afar out of curiosity.
-          </p>
-          <p className="text-zinc-200">
-            连接人与人的乐趣，旅游是对人文的探索，而不是仅仅的是消费。
-            是对异国文化和人类情感的理解和拥抱，而不是因为好奇而远观。
-          </p>
-        </div>
 
         {/* AI Agent Interface */}
         <div className="relative w-full max-w-3xl group mx-auto">
-          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-75 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200" />
-          <div className="relative flex items-center rounded-full bg-white p-2 shadow-2xl ring-1 ring-black/5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-lg animate-pulse">
-              <Sparkles className="h-6 w-6" />
+          {/* Glowing Background Effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-rose-500 via-fuchsia-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+          
+          <div className={`relative flex items-center overflow-hidden rounded-2xl transition-all duration-300 ${
+            isThinking 
+              ? "bg-white border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.5)]" 
+              : "bg-white/95 border-2 border-transparent hover:scale-[1.01] shadow-2xl"
+          }`}>
+            
+            {/* Icon Status */}
+            <div className="pl-6 pr-4">
+              {isThinking ? (
+                <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+              ) : (
+                <Sparkles className="h-8 w-8 text-rose-500 animate-pulse" />
+              )}
             </div>
+
             <input
               ref={inputRef}
               type="text"
@@ -122,31 +123,30 @@ export function Hero() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
-              className="flex-1 bg-transparent px-6 py-4 text-lg text-gray-900 placeholder:text-gray-400 focus:outline-none"
               disabled={isThinking}
+              className="h-24 w-full bg-transparent text-xl sm:text-2xl text-zinc-900 placeholder-zinc-400 outline-none font-medium"
             />
+
+            {/* Action Button */}
             <button 
               onClick={handleAgentAction}
-              disabled={isThinking}
-              className="mr-1 rounded-full bg-zinc-900 px-8 py-3 font-semibold text-white transition-all hover:bg-zinc-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              disabled={isThinking || !query.trim()}
+              className={`mr-4 p-4 rounded-xl transition-all ${
+                query.trim() 
+                  ? "bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-lg hover:shadow-rose-500/30 hover:scale-105" 
+                  : "bg-zinc-100 text-zinc-300 cursor-not-allowed"
+              }`}
             >
-              {isThinking ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Thinking...</span>
-                </>
-              ) : (
-                <>
-                  <span>Make it Happen</span>
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
+              <ArrowRight className="h-6 w-6" />
             </button>
           </div>
-          
-          {/* Agent Hints */}
-          <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-white/80">
-            <span className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">Try: "Find a local foodie to explore hidden gems"</span>
+
+          {/* Helper Text */}
+          <div className={`absolute -bottom-10 left-0 right-0 transition-opacity duration-300 ${isThinking ? 'opacity-100' : 'opacity-0'}`}>
+            <p className="text-base text-indigo-200 font-medium flex items-center justify-center gap-2 bg-black/50 py-1 px-4 rounded-full mx-auto w-fit backdrop-blur-sm">
+              <Sparkles className="h-4 w-4 text-indigo-400" />
+              AI Agent is finding your perfect match...
+            </p>
           </div>
         </div>
 
