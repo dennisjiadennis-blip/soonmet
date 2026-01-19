@@ -11,10 +11,13 @@ function DashboardContent() {
   const router = useRouter();
   const activeTab = searchParams.get("tab") === "hosting" ? "hosting" : "traveling";
   const [bookings, setBookings] = useState<any[]>([]);
+  const [isVerifiedHost, setIsVerifiedHost] = useState(false);
 
   useEffect(() => {
     const savedBookings = JSON.parse(localStorage.getItem('soonmet_bookings') || '[]');
     setBookings(savedBookings);
+    const verified = localStorage.getItem('soonmet_is_verified_host') === 'true';
+    setIsVerifiedHost(verified);
   }, []);
 
   const handleTabChange = (tab: string) => {

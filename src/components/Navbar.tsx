@@ -11,7 +11,13 @@ export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userMode, setUserMode] = useState<'visitor' | 'host'>('visitor');
   const [showMenu, setShowMenu] = useState(false);
+  const [isVerifiedHost, setIsVerifiedHost] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const verified = localStorage.getItem('soonmet_is_verified_host') === 'true';
+    setIsVerifiedHost(verified);
+  }, [showMenu]); // Check when menu opens to ensure fresh state
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -35,6 +41,13 @@ export function Navbar() {
 
   const toggleMode = () => {
     const newMode = userMode === 'visitor' ? 'host' : 'visitor';
+    
+    if (newMode === 'host' && !isVerifiedHost) {
+      setShowMenu(false);
+      router.push('/verify');
+      return;
+    }
+
     setUserMode(newMode);
     setShowMenu(false);
     if (newMode === 'host') {
@@ -95,7 +108,7 @@ export function Navbar() {
             {!isLoggedIn ? (
               <>
                 <Link 
-                  href="/host/apply"
+                  href="/verify"
                   className="hidden sm:flex text-sm font-medium text-zinc-300 hover:text-white transition-colors"
                 >
                   Become a Host
@@ -124,7 +137,14 @@ export function Navbar() {
                 {showMenu && (
                   <div className="absolute right-0 top-12 w-64 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     <div className="px-4 py-3 border-b border-zinc-800">
-                      <p className="text-sm font-medium text-white">Dennis Jia</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-white">Dennis Jia</p>
+                        {isVerifiedHost && (
+                          <span className="px-1.5 py-0.5 bg-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider rounded border border-yellow-500/30">
+                            Host
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-zinc-500 flex items-center gap-1 mt-1">
                         <CheckCircle className="h-3 w-3 text-green-500" />
                         Verified via Gmail
@@ -149,7 +169,7 @@ export function Navbar() {
                       </Link>
                       
                       <Link 
-                        href="/host/apply"
+                        href="/verify"
                         className="w-full px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white flex items-center gap-3 transition-colors"
                       >
                         <UserPlus className="h-4 w-4 text-green-400" />

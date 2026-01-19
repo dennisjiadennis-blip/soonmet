@@ -137,20 +137,10 @@ export function AgentChat() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col">
-      {/* 1. Header Area (Top) */}
-      <div className="flex-none flex flex-col items-center justify-center pb-4 transition-all duration-500">
-        <div className={`text-6xl md:text-8xl font-black leading-none tracking-tighter select-none transition-colors duration-500 ${getNumberColor(displayedCount)}`}>
-          {displayedCount}
-        </div>
-        <p className="text-zinc-400 text-sm font-light tracking-widest uppercase mt-2">
-          Potential Matches
-        </p>
-      </div>
-
-      {/* 2. Chat Area (Middle - Natural Flow) */}
-      <div className="w-full px-4 py-4" ref={scrollRef}>
-        <div className="max-w-3xl mx-auto space-y-6">
+    <div className="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-240px)] min-h-[500px]">
+      {/* 1. Chat Area (Middle - Natural Flow) */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 scroll-smooth" ref={scrollRef}>
+        <div className="max-w-3xl mx-auto space-y-6 min-h-full flex flex-col justify-end pb-4">
           {/* Messages - Normal Order (Oldest First) */}
           {messages.map((msg, idx) => (
             <motion.div
@@ -262,30 +252,44 @@ export function AgentChat() {
         </div>
       </div>
 
-      {/* 3. Input Area (Bottom) */}
-      <div className="flex-none w-full py-6 bg-transparent">
-        <div className="relative flex items-center max-w-3xl mx-auto w-full">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !isComposing) {
-                handleSearch();
-              }
-            }}
-            placeholder="Describe your ideal experience in Tokyo..."
-            className="w-full bg-zinc-900/80 backdrop-blur-xl border-2 border-indigo-500/30 text-white rounded-full pl-8 pr-16 py-4 text-lg shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-zinc-500"
-            autoFocus
-          />
-          <button
-            onClick={handleSearch}
-            className="absolute right-3 p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full transition-colors shadow-lg"
-          >
-            <Send className="w-5 h-5" />
-          </button>
+      {/* 3. Input Area & Stats (Bottom - Unified) */}
+      <div className="flex-none w-full pb-6 pt-2">
+        <div className="max-w-3xl mx-auto w-full flex flex-col gap-4">
+          
+          {/* Big Number Display - Visual Anchor */}
+          <div className="flex flex-col items-center justify-center transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+            <div className={`text-5xl md:text-7xl font-black leading-none tracking-tighter select-none tabular-nums transition-colors duration-500 ${getNumberColor(displayedCount)} drop-shadow-2xl`}>
+              {displayedCount}
+            </div>
+            <p className="text-zinc-500 text-xs font-medium tracking-widest uppercase mt-1">
+              Potential Matches
+            </p>
+          </div>
+
+          {/* Input Bar */}
+          <div className="relative flex items-center w-full">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !isComposing) {
+                  handleSearch();
+                }
+              }}
+              placeholder="Describe your ideal experience in Tokyo..."
+              className="w-full bg-zinc-900/90 backdrop-blur-xl border-2 border-indigo-500/30 text-white rounded-full pl-8 pr-16 py-4 text-lg shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-zinc-500"
+              autoFocus
+            />
+            <button
+              onClick={handleSearch}
+              className="absolute right-3 p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full transition-colors shadow-lg"
+            >
+              <Send className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
