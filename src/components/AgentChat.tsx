@@ -129,15 +129,15 @@ export function AgentChat() {
   };
 
   const getNumberColor = (count: number) => {
-    if (count > 100) return "text-white";
-    if (count > 50) return "text-green-500";
-    if (count > 20) return "text-red-500";
-    if (count > 10) return "text-pink-500";
-    return "text-blue-500";
+    if (count > 100) return "text-stone-400";
+    if (count > 50) return "text-emerald-600";
+    if (count > 20) return "text-orange-500";
+    if (count > 10) return "text-rose-500";
+    return "text-indigo-600";
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-240px)] min-h-[500px]">
+    <div className="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-200px)] min-h-[600px]">
       {/* 1. Chat Area (Middle - Natural Flow) */}
       <div className="flex-1 overflow-y-auto px-4 py-4 scroll-smooth" ref={scrollRef}>
         <div className="max-w-3xl mx-auto space-y-6 min-h-full flex flex-col justify-end pb-4">
@@ -152,10 +152,10 @@ export function AgentChat() {
               }`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-6 py-4 text-lg backdrop-blur-sm border ${
+                className={`max-w-[80%] rounded-2xl px-6 py-4 text-lg backdrop-blur-sm border shadow-sm ${
                   msg.role === "user"
-                    ? "bg-indigo-600/20 border-indigo-500/30 text-white"
-                    : "bg-zinc-800/80 border-white/10 text-zinc-200"
+                    ? "bg-[#172554] border-blue-900 text-white"
+                    : "bg-[#172554]/90 border-blue-900 text-white"
                 }`}
               >
                 {msg.content}
@@ -170,10 +170,10 @@ export function AgentChat() {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-start w-full"
             >
-              <div className="bg-zinc-800/80 backdrop-blur-md rounded-2xl px-6 py-4 flex gap-2 border border-white/5">
-                <span className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" />
-                <span className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce delay-100" />
-                <span className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce delay-200" />
+              <div className="bg-[#172554]/90 backdrop-blur-md rounded-2xl px-6 py-4 flex gap-2 border border-blue-900 shadow-sm">
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce" />
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce delay-100" />
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce delay-200" />
               </div>
             </motion.div>
           )}
@@ -184,7 +184,7 @@ export function AgentChat() {
               {results.map((activity) => (
                 <div 
                   key={activity.id}
-                  className="bg-zinc-900/80 border border-white/10 rounded-3xl p-6 relative hover:border-indigo-500/50 transition-all duration-300"
+                  className="bg-white/90 border border-stone-100 rounded-3xl p-6 relative hover:border-orange-200 transition-all duration-300 shadow-sm hover:shadow-md"
                 >
                   <a 
                     href={`/host/${activity.host.id}#activity-${activity.id}`}
@@ -203,41 +203,41 @@ export function AgentChat() {
                       <div>
                         <div className="flex justify-between items-start mb-2">
                            <div>
-                             <h3 className="text-2xl font-bold text-white group-hover:text-indigo-400 transition-colors">{activity.title}</h3>
+                             <h3 className="text-2xl font-bold text-stone-800 group-hover:text-orange-500 transition-colors">{activity.title}</h3>
                              <div className="flex items-center gap-2 mt-1">
                                <img src={activity.host.imageUrl} alt={activity.host.name} className="w-5 h-5 rounded-full object-cover" />
-                               <p className="text-zinc-400 text-sm">Initiated by <span className="text-zinc-200 font-medium">{activity.host.name}</span></p>
+                               <p className="text-stone-500 text-sm">Initiated by <span className="text-stone-800 font-medium">{activity.host.name}</span></p>
                              </div>
                            </div>
                            <div className="flex flex-col items-end gap-1">
-                             <div className="flex items-center gap-1.5 text-xs font-medium bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-500/20">
+                             <div className="flex items-center gap-1.5 text-xs font-medium bg-orange-50 text-orange-600 px-2.5 py-1 rounded-lg border border-orange-100">
                                <Sparkles className="w-3 h-3" />
                                98% Match
                              </div>
                            </div>
                         </div>
                         
-                        <p className="text-zinc-300 text-sm line-clamp-2 mb-3">{activity.description}</p>
+                        <p className="text-stone-500 text-sm line-clamp-2 mb-3">{activity.description}</p>
                         
                         {/* Match Reason */}
                         {activity.matchReason && (
-                          <div className="mb-4 text-sm text-indigo-200/80 italic">
+                          <div className="mb-4 text-sm text-stone-400 italic">
                             "{activity.matchReason}"
                           </div>
                         )}
 
                         {/* Detailed Stats */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-4 mt-2 text-sm text-zinc-400">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-4 mt-2 text-sm text-stone-400">
                           <div className="flex items-center gap-2">
-                            <Globe className="w-4 h-4 text-zinc-500" />
+                            <Globe className="w-4 h-4 text-stone-400" />
                             <span>{activity.host.nationality}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-zinc-500" />
+                            <User className="w-4 h-4 text-stone-400" />
                             <span>{activity.host.gender}</span>
                           </div>
                            <div className="flex items-center gap-2 col-span-2">
-                            <Calendar className="w-4 h-4 text-zinc-500" />
+                            <Calendar className="w-4 h-4 text-stone-400" />
                             <span className="truncate">{activity.duration}</span>
                           </div>
                         </div>
@@ -258,10 +258,10 @@ export function AgentChat() {
           
           {/* Big Number Display - Visual Anchor */}
           <div className="flex flex-col items-center justify-center transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
-            <div className={`text-5xl md:text-7xl font-black leading-none tracking-tighter select-none tabular-nums transition-colors duration-500 ${getNumberColor(displayedCount)} drop-shadow-2xl`}>
+            <div className={`text-5xl md:text-7xl font-black leading-none tracking-tighter select-none tabular-nums transition-colors duration-500 ${getNumberColor(displayedCount)}`}>
               {displayedCount}
             </div>
-            <p className="text-zinc-500 text-xs font-medium tracking-widest uppercase mt-1">
+            <p className="text-stone-400 text-xs font-medium tracking-widest uppercase mt-1">
               Potential Matches
             </p>
           </div>
@@ -280,12 +280,12 @@ export function AgentChat() {
                 }
               }}
               placeholder="Describe your ideal experience in Tokyo..."
-              className="w-full bg-zinc-900/90 backdrop-blur-xl border-2 border-indigo-500/30 text-white rounded-full pl-8 pr-16 py-4 text-lg shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-zinc-500"
+              className="w-full bg-[#172554] backdrop-blur-xl border-2 border-blue-800/50 text-white rounded-full pl-8 pr-16 py-4 text-lg shadow-lg shadow-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition-all placeholder:text-blue-200/50"
               autoFocus
             />
             <button
               onClick={handleSearch}
-              className="absolute right-3 p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full transition-colors shadow-lg"
+              className="absolute right-3 p-3 bg-gradient-to-r from-orange-500 to-rose-500 hover:opacity-90 text-white rounded-full transition-all shadow-md hover:shadow-lg transform hover:scale-105"
             >
               <Send className="w-5 h-5" />
             </button>

@@ -53,7 +53,7 @@ type AnalysisResult = {
 
 export default function VerifyPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"input" | "analyzing" | "result" | "kyc">("input");
+  const [step, setStep] = useState<"mode_selection" | "input" | "analyzing" | "result" | "kyc">("mode_selection");
   const [inputs, setInputs] = useState({
     airbnb: "",
     linkedin: "",
@@ -68,12 +68,67 @@ export default function VerifyPage() {
     accountName: "",
     paypayId: ""
   });
+  const [livenessStatus, setLivenessStatus] = useState<"idle" | "recording" | "analyzing" | "verified">("idle");
   const [progress, setProgress] = useState(0);
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
   const addLog = (msg: string) => {
     setLogs(prev => [...prev, msg]);
+  };
+
+  const startLivenessCheck = () => {
+    setLivenessStatus("recording");
+    setTimeout(() => {
+      setLivenessStatus("analyzing");
+      setTimeout(() => {
+        setLivenessStatus("verified");
+      }, 2000);
+    }, 3000);
+  };
+
+  const handleSmartImport = () => {
+    setStep("analyzing");
+    setProgress(0);
+    setLogs([]);
+
+    const timeline = [
+      { t: 500, p: 10, msg: "Connecting to Instagram API..." },
+      { t: 1500, p: 30, msg: "Extracting visual style and activities..." },
+      { t: 2500, p: 50, msg: "AI Personality Analysis: 'Energetic' & 'Creative'..." },
+      { t: 3500, p: 70, msg: "Scanning for cross-platform consistency..." },
+      { t: 4500, p: 90, msg: "Generating profile from digital footprint..." },
+    ];
+
+    timeline.forEach(({ t, p, msg }) => {
+      setTimeout(() => {
+        setProgress(p);
+        addLog(msg);
+      }, t);
+    });
+
+    setTimeout(() => {
+      setResult({
+        host_status: "Approved",
+        host_score: 85,
+        badges: ["Identity_Verified", "Social_Active"],
+        auto_profile: {
+          display_name: "Yuki Tanaka",
+          bio_summary: "A creative soul exploring Tokyo's hidden art scenes. Loves connecting through photography and cafe hopping.",
+          suggested_topics: ["Film Photography", "Hidden Cafes", "Modern Art"],
+          source_verification: "Verified via Instagram",
+          avatar_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=1061&q=80",
+          cover_images: [
+            "https://images.unsplash.com/photo-1493936734716-77ba6da66365?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+          ],
+          location: "Tokyo, Japan"
+        },
+        risk_flags: []
+      });
+      setStep("result");
+    }, 5000);
   };
 
   const handleAnalyze = () => {
@@ -142,6 +197,48 @@ export default function VerifyPage() {
            <h1 className="text-4xl font-bold text-white mb-2">Trust Migration</h1>
            <p className="text-zinc-400">Import your reputation from other platforms to become a Verified Host instantly.</p>
          </div>
+
+         {/* STEP 0: MODE SELECTION */}
+         {step === "mode_selection" && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              {/* Smart Import Option */}
+              <div className="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 rounded-3xl p-8 backdrop-blur-xl relative overflow-hidden group hover:border-indigo-500/50 transition-all cursor-pointer" onClick={() => setStep("input")}>
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Sparkles className="w-32 h-32" />
+                </div>
+                <div className="relative z-10">
+                  <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <Sparkles className="w-6 h-6 text-indigo-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">AI Smart Import</h3>
+                  <p className="text-zinc-400 text-sm mb-6">
+                    Connect your Instagram or Airbnb. AI automatically builds your profile, verifies your identity, and analyzes your personality vibe.
+                  </p>
+                  <div className="flex items-center gap-2 text-indigo-400 text-sm font-bold group-hover:translate-x-1 transition-transform">
+                    Start Auto-Verify <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Manual Option */}
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-xl group hover:bg-zinc-900/80 transition-all cursor-pointer" onClick={() => setStep("input")}>
+                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center mb-6">
+                  <Upload className="w-6 h-6 text-zinc-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Manual Entry</h3>
+                <p className="text-zinc-400 text-sm mb-6">
+                  Manually upload documents and fill in your profile details step by step. Best if you don't have public social media.
+                </p>
+                <div className="flex items-center gap-2 text-zinc-500 text-sm font-bold group-hover:text-white transition-colors">
+                  Continue Manually <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </motion.div>
+         )}
 
          {/* STEP 1: INPUT */}
          {step === "input" && (
@@ -381,17 +478,221 @@ export default function VerifyPage() {
                    <span>Minpaku License Verified</span>
                  </div>
                  <button 
-                   onClick={() => {
-                     localStorage.setItem('soonmet_is_verified_host', 'true');
-                     router.push("/dashboard?tab=hosting");
-                   }}
+                   onClick={() => setStep("kyc")}
                    className="flex items-center gap-2 px-6 py-2 bg-white text-black rounded-full font-bold hover:bg-zinc-200 transition-colors"
                  >
-                   Confirm & Publish
+                   Continue to ID Verification
                    <ArrowRight className="w-4 h-4" />
                  </button>
                </div>
              </div>
+           </motion.div>
+         )}
+
+         {/* STEP 4: KYC */}
+         {step === "kyc" && (
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-8 backdrop-blur-xl space-y-6"
+           >
+                {/* ID Type Selection */}
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { id: "license", label: "Driver's License", icon: CreditCard },
+                    { id: "mynumber", label: "My Number Card", icon:  ShieldCheck },
+                    { id: "passport", label: "Passport", icon: Globe },
+                    { id: "residence", label: "Residence Card", icon: Building },
+                  ].map((type) => (
+                    <div 
+                      key={type.id}
+                      onClick={() => setKycInputs({...kycInputs, idType: type.id})}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col items-center gap-2 text-center ${
+                        kycInputs.idType === type.id 
+                          ? "bg-indigo-600/20 border-indigo-500 text-white" 
+                          : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                      }`}
+                    >
+                      <type.icon className="w-6 h-6" />
+                      <span className="text-sm font-medium">{type.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Japan Compliance Warning */}
+                {kycInputs.idType === "mynumber" && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex gap-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0" />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-yellow-500">Japan Compliance Alert</h4>
+                      <p className="text-xs text-zinc-400">
+                        Per Japanese law, please ensure the <strong>12-digit My Number on the back is MASKED</strong>. Do not upload the back side unless covered.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Upload Area */}
+                <div className="border-2 border-dashed border-zinc-700 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-zinc-800/50 transition-colors cursor-pointer group">
+                  <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Upload className="w-6 h-6 text-zinc-400" />
+                  </div>
+                  <h3 className="text-white font-medium mb-1">Upload ID Document</h3>
+                  <p className="text-sm text-zinc-500">Front side clearly visible</p>
+                </div>
+
+                {/* Liveness Check Section */}
+                <div className="pt-6 border-t border-zinc-800">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Smartphone className="w-5 h-5 text-indigo-400" />
+                    Biometric Liveness Check
+                  </h3>
+                  
+                  {livenessStatus === "idle" && (
+                    <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-6 text-center">
+                      <div className="w-16 h-16 bg-zinc-900 rounded-full mx-auto mb-4 flex items-center justify-center relative">
+                        <div className="absolute inset-0 rounded-full border-2 border-indigo-500/30 animate-pulse" />
+                        <span className="text-2xl">📸</span>
+                      </div>
+                      <h4 className="text-white font-medium mb-2">3-Second Video Selfie</h4>
+                      <p className="text-sm text-zinc-400 mb-6 max-w-sm mx-auto">
+                        Please look at the camera and nod slowly to verify you are a real person and match your ID.
+                      </p>
+                      <button 
+                        onClick={startLivenessCheck}
+                        className="px-6 py-2 bg-white text-black rounded-full font-bold hover:bg-zinc-200 transition-colors"
+                      >
+                        Start Camera
+                      </button>
+                    </div>
+                  )}
+
+                  {livenessStatus === "recording" && (
+                    <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-6 text-center">
+                      <div className="w-16 h-16 bg-red-500/20 rounded-full mx-auto mb-4 flex items-center justify-center relative">
+                        <div className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping" />
+                        <div className="w-3 h-3 bg-red-500 rounded-sm" />
+                      </div>
+                      <h4 className="text-white font-medium mb-2">Recording...</h4>
+                      <p className="text-sm text-zinc-400">Please nod your head slowly</p>
+                    </div>
+                  )}
+
+                  {livenessStatus === "analyzing" && (
+                    <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-6 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                        <span className="text-sm text-zinc-300">Analyzing Biometrics & Deepfake Check...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {livenessStatus === "verified" && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6 flex items-center gap-4">
+                      <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-green-500 font-bold">Liveness Verified</h4>
+                        <p className="text-xs text-zinc-400">Face match confirmed with ID document.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment Information Section */}
+                <div className="pt-6 border-t border-zinc-800">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-indigo-400" />
+                    Payment Information
+                  </h3>
+                  
+                  <div className="flex gap-4 mb-4">
+                     <button
+                       onClick={() => setKycInputs({...kycInputs, paymentType: "bank"})}
+                       className={`flex-1 py-3 rounded-xl border font-medium transition-all ${
+                         kycInputs.paymentType === "bank"
+                           ? "bg-indigo-600/20 border-indigo-500 text-white"
+                           : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                       }`}
+                     >
+                       Bank Transfer
+                     </button>
+                     <button
+                       onClick={() => setKycInputs({...kycInputs, paymentType: "paypay"})}
+                       className={`flex-1 py-3 rounded-xl border font-medium transition-all ${
+                         kycInputs.paymentType === "paypay"
+                           ? "bg-indigo-600/20 border-indigo-500 text-white"
+                           : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                       }`}
+                     >
+                       PayPay
+                     </button>
+                  </div>
+
+                  {kycInputs.paymentType === "bank" ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <input 
+                          type="text" 
+                          placeholder="Bank Name"
+                          value={kycInputs.bankName}
+                          onChange={(e) => setKycInputs({...kycInputs, bankName: e.target.value})}
+                          className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors"
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Branch Code"
+                          value={kycInputs.branchCode}
+                          onChange={(e) => setKycInputs({...kycInputs, branchCode: e.target.value})}
+                          className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder="Account Number"
+                        value={kycInputs.accountNumber}
+                        onChange={(e) => setKycInputs({...kycInputs, accountNumber: e.target.value})}
+                        className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Account Holder Name (Katakana)"
+                        value={kycInputs.accountName}
+                        onChange={(e) => setKycInputs({...kycInputs, accountName: e.target.value})}
+                        className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors"
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <input 
+                        type="text" 
+                        placeholder="PayPay ID"
+                        value={kycInputs.paypayId}
+                        onChange={(e) => setKycInputs({...kycInputs, paypayId: e.target.value})}
+                        className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors"
+                      />
+                      <p className="text-xs text-zinc-500 mt-2">
+                        We will send a test payment of ¥1 to verify this ID.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <button 
+                  onClick={() => {
+                    localStorage.setItem('soonmet_is_verified_host', 'true');
+                    router.push("/dashboard?tab=hosting");
+                  }}
+                  disabled={livenessStatus !== "verified"}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all mt-8 ${
+                    livenessStatus === "verified"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:opacity-90 shadow-lg shadow-indigo-500/25"
+                      : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                  }`}
+                >
+                  Submit for Final Review
+                </button>
            </motion.div>
          )}
        </div>

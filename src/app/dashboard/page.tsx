@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { User, MapPin, Calendar, Star, Plus, Settings, ShieldCheck, Heart, DollarSign, BarChart3, Clock, Camera, Coffee } from "lucide-react";
+import { User, MapPin, Calendar, Star, Plus, Settings, ShieldCheck, Heart, DollarSign, BarChart3, Clock, Camera, Coffee, Link as LinkIcon, FileText, Send, Sparkles, TrendingUp, RefreshCw, Image as ImageIcon, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,13 +12,75 @@ function DashboardContent() {
   const activeTab = searchParams.get("tab") === "hosting" ? "hosting" : "traveling";
   const [bookings, setBookings] = useState<any[]>([]);
   const [isVerifiedHost, setIsVerifiedHost] = useState(false);
+  
+  // Trust Score State
+  const [trustScore, setTrustScore] = useState(0);
+  const [urlInput, setUrlInput] = useState("");
+  const [contentInput, setContentInput] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isScanningSNS, setIsScanningSNS] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState<{score: number, message: string} | null>(null);
 
   useEffect(() => {
     const savedBookings = JSON.parse(localStorage.getItem('soonmet_bookings') || '[]');
     setBookings(savedBookings);
     const verified = localStorage.getItem('soonmet_is_verified_host') === 'true';
     setIsVerifiedHost(verified);
+    
+    // Load trust score or default to base score
+    const savedScore = parseInt(localStorage.getItem('soonmet_trust_score') || '650');
+    setTrustScore(savedScore);
+    
+    // Pre-fill URL if saved
+    const savedUrl = localStorage.getItem('soonmet_host_sns_url');
+    if (savedUrl) setUrlInput(savedUrl);
   }, []);
+
+  const handleAIReview = async (type: 'content' | 'sns' | 'photos') => {
+    const isSNS = type === 'sns';
+    if (isSNS) {
+      if (!urlInput) return;
+      setIsScanningSNS(true);
+      // Save URL
+      localStorage.setItem('soonmet_host_sns_url', urlInput);
+    } else {
+      if (type === 'content' && !contentInput) return;
+      setIsAnalyzing(true);
+    }
+    
+    setAiFeedback(null);
+    
+    // Simulate AI Processing
+    setTimeout(() => {
+      let scoreIncrease = 0;
+      let message = "";
+
+      if (type === 'sns') {
+        scoreIncrease = Math.floor(Math.random() * 15) + 10;
+        message = "Found 3 new posts and updated activity. Your social presence is active!";
+      } else if (type === 'photos') {
+        scoreIncrease = Math.floor(Math.random() * 10) + 5;
+        message = "Photos analyzed. Visual verification score increased.";
+      } else {
+        scoreIncrease = Math.floor(Math.random() * 8) + 3;
+        message = "Knowledge entry verified. Your expertise adds value to the community.";
+      }
+
+      const newScore = trustScore + scoreIncrease;
+      setTrustScore(newScore);
+      localStorage.setItem('soonmet_trust_score', newScore.toString());
+      
+      setAiFeedback({
+        score: scoreIncrease,
+        message: message
+      });
+      
+      if (type === 'content') setContentInput("");
+      
+      setIsAnalyzing(false);
+      setIsScanningSNS(false);
+    }, 2500);
+  };
 
   const handleTabChange = (tab: string) => {
     router.push(`/dashboard?tab=${tab}`, { scroll: false });
@@ -174,7 +236,27 @@ function DashboardContent() {
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Host Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Trust Score Card */}
+                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-2xl border border-indigo-400/20 text-white relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <ShieldCheck className="w-24 h-24 rotate-12" />
+                  </div>
+                  <div className="flex items-center gap-3 mb-2 relative z-10">
+                    <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                      <TrendingUp className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-indigo-100">Trust Score</span>
+                  </div>
+                  <div className="text-3xl font-black tracking-tight relative z-10 flex items-end gap-2">
+                    {trustScore}
+                    <span className="text-sm font-medium text-indigo-200 mb-1">/ 1000</span>
+                  </div>
+                  <div className="mt-2 text-xs text-indigo-100 relative z-10">
+                    Top 5% of hosts
+                  </div>
+                </div>
+
                 <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-green-100 dark:bg-green-500/10 rounded-lg">
@@ -203,6 +285,120 @@ function DashboardContent() {
                   <div className="text-2xl font-bold">4.9</div>
                 </div>
               </div>
+
+              {/* Trust & Credit Builder Section */}
+              <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-8 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                      <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-indigo-500" />
+                        Build Your Host Credit
+                      </h2>
+                      <p className="text-zinc-500 text-sm mt-1">
+                        Add more details about yourself to increase your Trust Score. AI evaluates your content daily.
+                      </p>
+                    </div>
+                    {aiFeedback && (
+                      <div className="bg-green-500/10 text-green-600 border border-green-500/20 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-right">
+                        <TrendingUp className="w-4 h-4" />
+                        +{aiFeedback.score} Points: {aiFeedback.message}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* 1. Knowledge & Skills */}
+                    <div className="space-y-4">
+                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Knowledge & Experience
+                      </label>
+                      <div className="relative">
+                        <FileText className="absolute left-3 top-3 w-4 h-4 text-zinc-400" />
+                        <textarea 
+                          placeholder="Share unique skills, local secrets, or past experiences..."
+                          value={contentInput}
+                          onChange={(e) => setContentInput(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all min-h-[100px] resize-none"
+                        />
+                      </div>
+                      <button
+                        onClick={() => handleAIReview('content')}
+                        disabled={isAnalyzing || !contentInput}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg font-medium text-sm hover:opacity-90 disabled:opacity-50 transition-all"
+                      >
+                        {isAnalyzing ? "Analyzing..." : "Submit Experience"}
+                      </button>
+                    </div>
+
+                    {/* 2. Visual Story (Photos) */}
+                    <div className="space-y-4">
+                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Visual Verification
+                      </label>
+                      <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer group" onClick={() => handleAIReview('photos')}>
+                        <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-full group-hover:scale-110 transition-transform">
+                          <ImageIcon className="w-6 h-6 text-indigo-500" />
+                        </div>
+                        <p className="text-sm text-zinc-500">
+                          Upload recent photos to verify your lifestyle
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleAIReview('photos')}
+                        disabled={isAnalyzing}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg font-medium text-sm hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
+                      >
+                        <Camera className="w-4 h-4" />
+                        Upload & Scan
+                      </button>
+                    </div>
+
+                    {/* 3. Social Presence (SNS) */}
+                    <div className="space-y-4">
+                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Social Presence
+                      </label>
+                      <div className="relative">
+                        <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input 
+                          type="url" 
+                          placeholder="Instagram / Twitter / Blog"
+                          value={urlInput}
+                          onChange={(e) => setUrlInput(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <button
+                        onClick={() => handleAIReview('sns')}
+                        disabled={isScanningSNS || !urlInput}
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                          isScanningSNS 
+                            ? 'bg-indigo-100 text-indigo-600' 
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }`}
+                      >
+                        {isScanningSNS ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            Scanning Updates...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="w-4 h-4" />
+                            {localStorage.getItem('soonmet_host_sns_url') ? 'Re-Scan for Updates' : 'Connect & Scan'}
+                          </>
+                        )}
+                      </button>
+                      <p className="text-xs text-zinc-400 text-center">
+                        AI periodically checks for new posts
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
 
               {/* Your Listings */}
               <section>

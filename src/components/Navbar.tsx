@@ -72,10 +72,10 @@ export function Navbar() {
   const currentNavItems = userMode === 'visitor' ? visitorNavItems : hostNavItems;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/20 bg-[#637C88]/90 backdrop-blur-md supports-[backdrop-filter]:bg-[#637C88]/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
+          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-rose-500">
             SoonMet
           </span>
         </Link>
@@ -92,8 +92,8 @@ export function Navbar() {
                   href={item.href}
                   className={`relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-white/10 text-white"
-                      : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                      ? "bg-stone-100 text-stone-900 shadow-sm"
+                      : "text-stone-500 hover:bg-stone-50 hover:text-stone-800"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -109,13 +109,13 @@ export function Navbar() {
               <>
                 <Link 
                   href="/verify"
-                  className="hidden sm:flex text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                  className="hidden sm:flex text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors"
                 >
                   Become a Host
                 </Link>
                 <button
                   onClick={handleLogin}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900 text-white text-sm font-bold hover:bg-stone-800 transition-colors shadow-sm"
                 >
                   <LogIn className="h-4 w-4" />
                   Log in
@@ -125,27 +125,27 @@ export function Navbar() {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 transition-all"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 transition-all shadow-sm"
                 >
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-orange-400 to-rose-400 flex items-center justify-center text-white font-bold text-xs">
                     DJ
                   </div>
-                  <Menu className="h-4 w-4 text-zinc-400" />
+                  <Menu className="h-4 w-4 text-stone-500" />
                 </button>
 
                 {/* Dropdown Menu */}
                 {showMenu && (
-                  <div className="absolute right-0 top-12 w-64 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="px-4 py-3 border-b border-zinc-800">
+                  <div className="absolute right-0 top-12 w-64 bg-white border border-stone-100 rounded-2xl shadow-xl py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-black/5">
+                    <div className="px-4 py-3 border-b border-stone-100">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-white">Dennis Jia</p>
+                        <p className="text-sm font-medium text-stone-900">Dennis Jia</p>
                         {isVerifiedHost && (
-                          <span className="px-1.5 py-0.5 bg-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider rounded border border-yellow-500/30">
+                          <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold uppercase tracking-wider rounded border border-orange-200">
                             Host
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-zinc-500 flex items-center gap-1 mt-1">
+                      <p className="text-xs text-stone-500 flex items-center gap-1 mt-1">
                         <CheckCircle className="h-3 w-3 text-green-500" />
                         Verified via Gmail
                       </p>
@@ -154,33 +154,33 @@ export function Navbar() {
                     <div className="py-2">
                       <button 
                         onClick={toggleMode}
-                        className="w-full px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white flex items-center gap-3 transition-colors"
+                        className="w-full px-4 py-2.5 text-sm text-stone-600 hover:bg-stone-50 hover:text-stone-900 flex items-center gap-3 transition-colors"
                       >
-                        <Repeat className="h-4 w-4 text-indigo-400" />
+                        <Repeat className="h-4 w-4 text-orange-500" />
                         Switch to {userMode === 'visitor' ? 'Hosting' : 'Traveling'}
                       </button>
                       
                       <Link 
                         href="/dashboard"
-                        className="w-full px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white flex items-center gap-3 transition-colors"
+                        className="w-full px-4 py-2.5 text-sm text-stone-600 hover:bg-stone-50 hover:text-stone-900 flex items-center gap-3 transition-colors"
                       >
-                        <User className="h-4 w-4 text-blue-400" />
+                        <User className="h-4 w-4 text-blue-500" />
                         Manage Account
                       </Link>
                       
                       <Link 
                         href="/verify"
-                        className="w-full px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white flex items-center gap-3 transition-colors"
+                        className="w-full px-4 py-2.5 text-sm text-stone-600 hover:bg-stone-50 hover:text-stone-900 flex items-center gap-3 transition-colors"
                       >
-                        <UserPlus className="h-4 w-4 text-green-400" />
+                        <UserPlus className="h-4 w-4 text-green-500" />
                         {userMode === 'visitor' ? 'Create a new Experience' : 'Edit Listing'}
                       </Link>
                     </div>
 
-                    <div className="border-t border-zinc-800 pt-2">
+                    <div className="border-t border-stone-100 pt-2">
                       <button 
                         onClick={() => { setIsLoggedIn(false); setShowMenu(false); }}
-                        className="w-full px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800 hover:text-red-300 flex items-center gap-3 transition-colors"
+                        className="w-full px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 hover:text-rose-600 flex items-center gap-3 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
                         Log out
