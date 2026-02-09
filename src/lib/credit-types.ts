@@ -45,7 +45,7 @@ export interface TierConfig {
 
 export const TIER_CONFIG: Record<number, TierConfig> = {
   0: {
-    maxPrice: 2000,
+    maxPrice: 1000,
     label: "Level 0",
     title: "Newcomer",
     description: "Simply register to publish guides. Share local spots you know well.",
@@ -60,54 +60,67 @@ export const TIER_CONFIG: Record<number, TierConfig> = {
   1: {
     maxPrice: 2000,
     label: "L1",
-    title: "Student Host",
-    description: "Passed SheerID verification. Public profile with nickname, gender, and age.",
-    avgWeeklyIncome: 30000,
-    weeklyRevenue: "¥30,000",
+    title: "Basic Host",
+    description: "Verified Student (.ac.jp). Minimal entry, basic authenticity.",
+    avgWeeklyIncome: 2000, // Hourly rate ref
+    weeklyRevenue: "¥2,000/hr",
     upgradeTime: "Instant",
     coreProcess: "SheerID + Basic Info",
-    requirements: ["SheerID Verification", "Nickname", "Gender", "Age", "Public Info"],
+    requirements: ["University Email (.ac.jp)", "Decent Nickname"],
     commissionRate: 0.20,
     guideSuggestion: "Campus tours, cheap eats, student life experiences."
   },
   2: {
-    maxPrice: 5000,
+    maxPrice: 3500,
     label: "L2",
-    title: "Vibe Host",
-    description: "Profile Photo Uploaded. Public Instagram accessible to visitors.",
-    avgWeeklyIncome: 50000,
-    weeklyRevenue: "¥50,000",
+    title: "Social Host",
+    description: "Vibe verified. 3 authentic photos required. No stock photos.",
+    avgWeeklyIncome: 3500, // Hourly rate ref
+    weeklyRevenue: "¥3,500/hr",
     upgradeTime: "10 mins",
-    coreProcess: "Photo + Public SNS",
-    requirements: ["Profile Photo", "Public Instagram"],
+    coreProcess: "Visual Audit (3 Photos)",
+    requirements: ["3 Authentic Photos", "Public Instagram", "Vibe Check"],
     commissionRate: 0.20,
     guideSuggestion: "Craftsmanship experiences, familiar places, local eateries, art galleries."
   },
   3: {
-    maxPrice: 8000,
+    maxPrice: 5000,
     label: "L3",
-    title: "Ace Host",
-    description: "Completed 5+ Host Services. ID Verified. Specialized in Anime, Gourmet, Fashion.",
-    avgWeeklyIncome: 80000,
-    weeklyRevenue: "¥80,000",
+    title: "Verified Host",
+    description: "Identity verified via Stripe. Highest legal trust level.",
+    avgWeeklyIncome: 5000, // Hourly rate ref
+    weeklyRevenue: "¥5,000/hr",
     upgradeTime: "1-2 days",
-    coreProcess: "5+ Services + ID Check",
-    requirements: ["5+ Host Services", "ID Verification", "Special Tags"],
+    coreProcess: "Stripe Identity",
+    requirements: ["Real Name Consistency", "Legal Trust"],
     commissionRate: 0.20,
     guideSuggestion: "Unique hobbies and skills: Manga, models, amateur theater, private artist visits."
   },
   4: {
+    maxPrice: 8000,
+    label: "PRO",
+    title: "Expert Host",
+    description: "Tatami Labs linked. Cultural Translator capable of deep decoding.",
+    avgWeeklyIncome: 8000, // Hourly rate ref
+    weeklyRevenue: "¥8,000/hr",
+    upgradeTime: "Invitation",
+    coreProcess: "Tatami Labs Content",
+    requirements: ["Cultural Translation", "Tatami Labs Feature"],
+    commissionRate: 0.20,
+    guideSuggestion: "Deep cultural immersion, artisan interviews, exclusive access."
+  },
+  5: { // Legend/Maestro (Keeping existing logic for 5 if needed, or mapping PRO to 4)
     maxPrice: Infinity,
-    label: "L4",
-    title: "Maestro Host",
-    description: "Completed 20+ Host Services. Invitation Only. Professionals, Celebrities.",
-    avgWeeklyIncome: 200000,
-    weeklyRevenue: "Uncapped",
-    upgradeTime: "Invitation Only",
-    coreProcess: "20+ Services + Vetting",
-    requirements: ["20+ Host Services", "Invitation Only"],
-    commissionRate: 0.20, // Should be scalable but using 0.20 as base
-    guideSuggestion: "Master craftsman workshops, unique cultural figures, celebrities."
+    label: "Legend",
+    title: "Maestro",
+    description: "The ultimate local authority.",
+    avgWeeklyIncome: 15000,
+    weeklyRevenue: "¥15,000+/hr",
+    upgradeTime: "Years",
+    coreProcess: "Legacy",
+    requirements: ["Legend Status"],
+    commissionRate: 0.15,
+    guideSuggestion: "Life-changing experiences."
   }
 };
 

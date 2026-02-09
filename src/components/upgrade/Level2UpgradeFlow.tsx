@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Facebook, Linkedin, Twitter, CheckCircle, Instagram, Upload, Image as ImageIcon } from "lucide-react";
+import { Loader2, CheckCircle, Upload, X } from "lucide-react";
 import { AIEvaluationResult } from "@/lib/credit-types";
 
 interface Level2UpgradeFlowProps {
@@ -10,80 +10,111 @@ interface Level2UpgradeFlowProps {
   onCancel: () => void;
 }
 
+interface AIResponse {
+  audit_result: {
+    status: string;
+    target_level: string;
+    suggested_hourly_rate: string;
+  };
+  content_score: {
+    vibe_score: number;
+    safety_check: string;
+    risks: string;
+  };
+  optimized_content: {
+    english_headline: string;
+    english_bio: string;
+  };
+  action_items: string[];
+}
+
 export function Level2UpgradeFlow({ onComplete, onCancel }: Level2UpgradeFlowProps) {
   const [step, setStep] = useState<"connect" | "analyzing" | "result">("connect");
   const [realName, setRealName] = useState("");
-  const [avatar, setAvatar] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [bio, setBio] = useState("");
   const [isPublicIg, setIsPublicIg] = useState(false);
+  const [aiResult, setAiResult] = useState<AIResponse | null>(null);
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     if (!realName.trim()) {
       alert("Please enter your real name first.");
       return;
     }
-    if (!avatar) {
-      alert("Please upload a profile photo.");
+    if (photos.length < 3) {
+      alert("Please upload at least 3 photos to show your vibe.");
+      return;
+    }
+    if (!bio.trim()) {
+      alert("Please enter a short bio about yourself.");
       return;
     }
     if (!isPublicIg) {
       alert("You must agree to make your Instagram public to visitors.");
       return;
     }
-    // setConnectedProvider(provider);
-    setStep("analyzing");
-    // Simulate API Call
-    setTimeout(() => {
-      setStep("result");
-    }, 2500);
-  };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAvatar(e.target.files[0]);
+    setStep("analyzing");
+
+    try {
+      // Convert photos to base64
+      const imagePromises = photos.map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
+
+      const base64Images = await Promise.all(imagePromises);
+
+      const response = await fetch('/api/ai/evaluate-host', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bio,
+          images: base64Images,
+          level: 'L2',
+          realName
+        }),
+      });
+
+      const result = await response.json();
+      setAiResult(result);
+      setStep("result");
+
+    } catch (error) {
+      console.error("Evaluation failed", error);
+      alert("AI Evaluation failed. Please try again.");
+      setStep("connect");
     }
   };
 
-  const mockResult: AIEvaluationResult = {
-    authenticityScore: 0.95,
-    personalityTags: ["Art Enthusiast", "Foodie", "Local Expert"],
-    vibeSummary: "Host shows consistent and authentic engagement with local culture. High quality content suggests reliability.",
-    evaluatedAt: new Date().toISOString(),
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setPhotos(prev => [...prev, ...newFiles].slice(0, 3));
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl dark:bg-zinc-900">
+      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl dark:bg-zinc-900 overflow-y-auto max-h-[90vh]">
         {step === "connect" && (
           <>
-            <h3 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Connect Social Media</h3>
+            <h3 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Apply for Social Host (L2)</h3>
             <p className="mb-6 text-sm text-zinc-500">
-              To become a Vibe Host (L2), we need to verify your real identity and social vibe.
+              Upgrade to L2 (¥3,500/hr) by verifying your social vibe. Our AI curator will audit your profile.
             </p>
             
             <div className="space-y-4 mb-6">
-              {/* Profile Photo Upload */}
-              <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Profile Photo <span className="text-red-500">*</span>
-                </label>
-                <div className="flex items-center justify-center w-full">
-                  <label htmlFor="avatar-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-zinc-300 border-dashed rounded-lg cursor-pointer bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-zinc-500 dark:hover:bg-zinc-700">
-                    {avatar ? (
-                        <div className="flex flex-col items-center">
-                            <ImageIcon className="w-8 h-8 text-green-500 mb-2" />
-                            <p className="text-sm text-zinc-500">{avatar.name}</p>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-8 h-8 text-zinc-400 mb-2" />
-                            <p className="text-xs text-zinc-500">Click to upload avatar</p>
-                        </div>
-                    )}
-                    <input id="avatar-upload" type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-                  </label>
-                </div>
-              </div>
-
               {/* Real Name */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -96,7 +127,49 @@ export function Level2UpgradeFlow({ onComplete, onCancel }: Level2UpgradeFlowPro
                   placeholder="Official name on ID"
                   className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
                 />
-                <p className="mt-1 text-xs text-zinc-500">Only used for verification. Not shown to guests.</p>
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Your Bio <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tell us about yourself..."
+                  rows={3}
+                  className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
+                />
+                <p className="text-xs text-zinc-500">AI will optimize this for Western tourists.</p>
+              </div>
+
+              {/* Photos Upload */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Upload 3 Vibe Photos <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {photos.map((photo, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                      <img src={URL.createObjectURL(photo)} alt="preview" className="h-full w-full object-cover" />
+                      <button 
+                        onClick={() => removePhoto(idx)}
+                        className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-black/70"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {photos.length < 3 && (
+                    <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
+                      <Upload className="h-6 w-6 text-zinc-400" />
+                      <span className="mt-1 text-xs text-zinc-500">Add Photo</span>
+                      <input type="file" className="hidden" accept="image/*" multiple onChange={handleFileChange} />
+                    </label>
+                  )}
+                </div>
+                <p className="mt-1 text-xs text-zinc-500">Show us your local vibe. No stock photos.</p>
               </div>
 
               {/* Public Instagram Toggle */}
@@ -116,62 +189,82 @@ export function Level2UpgradeFlow({ onComplete, onCancel }: Level2UpgradeFlowPro
               </div>
             </div>
 
-            <p className="mb-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Connect one of your social accounts:
-            </p>
-            <div className="space-y-3">
-              <button onClick={() => handleConnect()} className="flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-200 p-3 font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
-                <Instagram className="h-5 w-5 text-pink-600" /> Connect Instagram
-              </button>
-              <button onClick={() => handleConnect()} className="flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-200 p-3 font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
-                <Facebook className="h-5 w-5 text-blue-600" /> Connect Facebook
-              </button>
-              <button onClick={() => handleConnect()} className="flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-200 p-3 font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
-                <Linkedin className="h-5 w-5 text-blue-700" /> Connect LinkedIn
-              </button>
-              <button onClick={() => handleConnect()} className="flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-200 p-3 font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
-                <Twitter className="h-5 w-5 text-sky-500" /> Connect X (Twitter)
-              </button>
-            </div>
-            <button onClick={onCancel} className="mt-6 w-full text-sm text-zinc-500 hover:underline">Cancel</button>
+            <button 
+              onClick={handleConnect} 
+              disabled={photos.length < 3 || !realName || !bio || !isPublicIg}
+              className="w-full rounded-lg bg-indigo-600 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              Start AI Audit
+            </button>
+            <button onClick={onCancel} className="mt-4 w-full text-sm text-zinc-500 hover:underline">Cancel</button>
           </>
         )}
 
         {step === "analyzing" && (
           <div className="flex flex-col items-center py-8">
             <Loader2 className="mb-4 h-12 w-12 animate-spin text-indigo-600" />
-            <h3 className="mb-2 text-lg font-bold">AI Analyzing Profile...</h3>
+            <h3 className="mb-2 text-lg font-bold">AI Curator is Auditing...</h3>
             <p className="text-center text-sm text-zinc-500">
-              GPT-4o is reviewing your public metadata to generate a vibe report.
+              Analyzing visual authenticity and optimizing your bio...
             </p>
           </div>
         )}
 
-        {step === "result" && (
+        {step === "result" && aiResult && (
           <div>
              <div className="mb-6 flex flex-col items-center text-center">
-                <div className="mb-4 rounded-full bg-green-100 p-3 text-green-600 dark:bg-green-900/30">
+                <div className={`mb-4 rounded-full p-3 ${aiResult.audit_result?.status === 'Approved' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
                   <CheckCircle className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-bold">Analysis Complete!</h3>
-                <p className="text-zinc-500">Your profile has been verified.</p>
+                <h3 className="text-xl font-bold">{aiResult.audit_result?.status === 'Approved' ? 'Approved!' : 'Pending Review'}</h3>
+                <p className="text-zinc-500">Target Level: {aiResult.audit_result?.target_level}</p>
              </div>
 
-             <div className="mb-6 rounded-lg bg-zinc-50 p-4 text-sm dark:bg-zinc-800">
-                <p className="font-semibold text-zinc-700 dark:text-zinc-300">AI Summary:</p>
-                <p className="italic text-zinc-600 dark:text-zinc-400">&quot;{mockResult.vibeSummary}&quot;</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {mockResult.personalityTags.map(tag => (
-                    <span key={tag} className="rounded-full bg-white px-2 py-1 text-xs font-medium shadow-sm dark:bg-zinc-700">#{tag}</span>
-                  ))}
+             <div className="mb-4 space-y-4">
+                {/* Vibe Score */}
+                <div className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800">
+                   <div className="flex items-center justify-between">
+                     <span className="font-semibold">Vibe Score</span>
+                     <span className="text-xl font-bold text-indigo-600">{aiResult.content_score?.vibe_score}/10</span>
+                   </div>
+                   <div className="mt-2 text-xs text-zinc-500">
+                     Safety Check: {aiResult.content_score?.safety_check}
+                   </div>
                 </div>
+
+                {/* Optimized Content */}
+                <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 dark:border-indigo-900/50 dark:bg-indigo-900/20">
+                   <h4 className="mb-2 text-sm font-bold text-indigo-900 dark:text-indigo-100">✨ AI Optimized Bio</h4>
+                   <p className="mb-1 text-sm font-semibold text-indigo-800 dark:text-indigo-200">{aiResult.optimized_content?.english_headline}</p>
+                   <p className="text-sm italic text-indigo-700 dark:text-indigo-300">&quot;{aiResult.optimized_content?.english_bio}&quot;</p>
+                </div>
+
+                {/* Action Items */}
+                {aiResult.action_items && aiResult.action_items.length > 0 && (
+                  <div className="rounded-lg bg-orange-50 p-4 text-sm text-orange-800 dark:bg-orange-900/20 dark:text-orange-200">
+                    <p className="font-bold mb-1">Curator Suggestions:</p>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {aiResult.action_items.map((item: string, i: number) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
              </div>
 
              <button 
                onClick={() => {
-                 // Create a fake URL for the avatar since we don't have a backend
-                 const avatarUrl = avatar ? URL.createObjectURL(avatar) : "";
-                 onComplete(mockResult, {
+                 // Create a fake URL for the avatar (use the first photo)
+                 const avatarUrl = photos.length > 0 ? URL.createObjectURL(photos[0]) : "";
+                 
+                 const result: AIEvaluationResult = {
+                    authenticityScore: aiResult.content_score?.vibe_score ? aiResult.content_score.vibe_score / 10 : 0.8,
+                    personalityTags: ["Vibe Verified", "Local"],
+                    vibeSummary: aiResult.optimized_content?.english_bio || "Verified Host",
+                    evaluatedAt: new Date().toISOString()
+                 };
+
+                 onComplete(result, {
                    avatarUrl,
                    isPublicIg,
                    realName
@@ -179,7 +272,7 @@ export function Level2UpgradeFlow({ onComplete, onCancel }: Level2UpgradeFlowPro
                }}
                className="w-full rounded-lg bg-indigo-600 py-3 font-bold text-white hover:bg-indigo-700"
              >
-               Confirm & Upgrade to Level 2
+               Confirm & Upgrade
              </button>
           </div>
         )}

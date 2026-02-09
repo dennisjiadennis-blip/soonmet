@@ -24,7 +24,7 @@ export function CreditSystem() {
   // Mock Initial State (Level 1)
   const [profile, setProfile] = useState<HostCreditProfile>({
     level: 1,
-    maxPrice: 3000,
+    maxPrice: 2000,
     isIdentityVerified: false,
     isBiometricVerified: false,
     socialMediaConnected: false,
@@ -43,7 +43,7 @@ export function CreditSystem() {
       setProfile((prev) => ({
         ...prev,
         level: 2,
-        maxPrice: 5000,
+        maxPrice: 3500,
         socialMediaConnected: true,
         aiEvaluation: result,
       }));
@@ -62,7 +62,7 @@ export function CreditSystem() {
       setProfile((prev) => ({
         ...prev,
         level: 3,
-        maxPrice: 8000,
+        maxPrice: 5000,
         isIdentityVerified: true,
       }));
       setIsLoading(false);
@@ -76,8 +76,22 @@ export function CreditSystem() {
       setProfile((prev) => ({
         ...prev,
         level: 4,
-        maxPrice: Infinity, // Uncapped
+        maxPrice: 8000,
         isBiometricVerified: true,
+      }));
+      setIsLoading(false);
+    }, 2000);
+  };
+
+  const handleLevel5Upgrade = async () => {
+    setIsLoading(true);
+    // Simulate Invitation Process
+    setTimeout(() => {
+      setProfile((prev) => ({
+        ...prev,
+        level: 5,
+        maxPrice: Infinity, // Uncapped
+        legendStatus: "APPROVED",
       }));
       setIsLoading(false);
     }, 2000);
@@ -97,13 +111,13 @@ export function CreditSystem() {
             </div>
             <p className="mt-1 text-zinc-500 dark:text-zinc-400">
               Current Pricing Cap: <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                {profile.level === 4 ? "Uncapped" : `¥${CREDIT_LEVELS[profile.level].maxPrice.toLocaleString()} / hour`}
+                {profile.level === 5 ? "Uncapped" : `¥${CREDIT_LEVELS[profile.level].maxPrice.toLocaleString()} / hour`}
               </span>
             </p>
           </div>
           
           {/* Progress Bar or Next Step Hint */}
-          {profile.level < 4 && (
+          {profile.level < 5 && (
             <div className="flex items-center gap-4 rounded-lg bg-indigo-50 px-4 py-3 dark:bg-indigo-900/20">
               <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               <div>
@@ -111,7 +125,7 @@ export function CreditSystem() {
                   Unlock Level {profile.level + 1}
                 </p>
                 <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                  Increase cap to {profile.level === 3 ? "Uncapped" : `¥${CREDIT_LEVELS[(profile.level + 1) as CreditLevel].maxPrice.toLocaleString()}`}
+                  Increase cap to {profile.level === 4 ? "Uncapped" : `¥${CREDIT_LEVELS[(profile.level + 1) as CreditLevel].maxPrice.toLocaleString()}`}
                 </p>
               </div>
             </div>
@@ -220,6 +234,20 @@ export function CreditSystem() {
             isLocked={profile.level < 3}
           />
 
+          {/* Level 5 */}
+          <StepItem 
+            level={5}
+            currentLevel={profile.level}
+            title="Legend Status"
+            description="Invitation only. For hosts who have reached the pinnacle of hospitality."
+            icon={<Zap className="h-5 w-5" />}
+            isCompleted={profile.level >= 5}
+            isLoading={isLoading && profile.level === 4}
+            onAction={handleLevel5Upgrade}
+            actionLabel="Request Invitation"
+            isLocked={profile.level < 4}
+          />
+
         </div>
       </div>
     </div>
@@ -302,6 +330,7 @@ function getLevelColor(level: number) {
     case 2: return "text-blue-500";
     case 3: return "text-indigo-500";
     case 4: return "text-amber-500";
+    case 5: return "text-purple-500";
     default: return "text-zinc-500";
   }
 }
