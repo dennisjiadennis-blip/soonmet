@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import { GeneratedItinerary } from "@/lib/generator";
 
 interface GuideContextType {
@@ -11,19 +11,19 @@ interface GuideContextType {
 const GuideContext = createContext<GuideContextType | undefined>(undefined);
 
 export function GuideProvider({ children }: { children: ReactNode }) {
-  const [guides, setGuides] = useState<GeneratedItinerary[]>([]);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("tokyo-travel-pro-guides");
-    if (saved) {
-      try {
-        setGuides(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse guides", e);
+  const [guides, setGuides] = useState<GeneratedItinerary[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tokyo-travel-pro-guides");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Failed to parse guides", e);
+        }
       }
     }
-  }, []);
+    return [];
+  });
 
   const addGuide = (guide: GeneratedItinerary) => {
     setGuides((prev) => {

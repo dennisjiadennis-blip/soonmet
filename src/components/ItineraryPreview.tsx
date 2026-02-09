@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useRef, useState } from "react";
@@ -9,17 +10,23 @@ import {
   Train, 
   MapPin, 
   MessageCircle, 
-  Languages, 
   ExternalLink,
   Megaphone,
   Bot,
   ShoppingBag,
   Star,
   Coins,
-  Bus
+  Bus,
+  Clock,
+  Calendar,
+  Users,
+  CheckCircle,
+  ShieldCheck
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import { THEME_TAGS } from "@/lib/theme-tags";
+import { InteractiveMap } from "./InteractiveMap";
 
 interface ItineraryPreviewProps {
   data: GeneratedItinerary;
@@ -39,7 +46,6 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
       nearestStation: "最寄駅",
       googleMaps: "Googleマップ",
       openLocation: "場所を開く",
-      languageCards: "旅行者用会話カード",
       googleMapsHighlight: "Googleマップのハイライト",
       footer: "GuideCrafter AIで作成 • 地元民による検証済みコンテンツ",
       exportCenter: "エクスポートセンター",
@@ -58,7 +64,27 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
       agentPrompt: "エージェント用プロンプト",
       gumroadDesc: "Gumroad説明文",
       copied: "クリップボードにコピーしました！",
-      estCost: "現地費用目安"
+      estCost: "現地費用目安",
+      estGuestExpense: "ゲスト実費目安",
+      whyRecommend: "おすすめの理由",
+      locationInfo: "基本情報",
+      timeInfo: "日時・集合場所",
+      pricingInfo: "費用について",
+      hostFee: "Hostガイド料",
+      guestExpense: "ゲスト実費目安",
+      totalPrice: "合計金額",
+      included: "料金に含まれるもの",
+      maxGroup: "最大人数",
+      startDate: "開始日",
+      duration: "所要時間",
+      meetingPoint: "集合場所",
+      policiesTitle: "重要事項・キャンセル規定",
+      policyVisitorCancel: "ゲストキャンセル：24時間前まで全額返金",
+      policyVisitorPayment: "ゲスト支払い：予約時に事前決済",
+      policyHostPayout: "報酬受取：ゲストの「集合コード」確認後に送金",
+      policyHostCancel: "ホストキャンセル：48時間前までに要連絡",
+      policyHostCancelPath: "キャンセル方法：運営LINEへ連絡",
+      aboutHost: "ホストについて"
     },
     Other: {
       secretGuide: "Local's Secret Guide",
@@ -69,7 +95,6 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
       nearestStation: "Nearest Station",
       googleMaps: "Google Maps",
       openLocation: "Open Location",
-      languageCards: "Traveler Language Cards",
       googleMapsHighlight: "Google Maps Highlight",
       footer: "Created with GuideCrafter AI • Verified Local Content",
       exportCenter: "Export Center",
@@ -78,6 +103,7 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
       generating: "Generating PDF...",
       plateA: "Plate A: The Product (PDF Preview)",
       plateASub: "This is what your customers receive",
+      aboutHost: "About Your Host",
       plateB: "Plate B: Poster Prompt",
       plateBSub: "For Midjourney / Social Media",
       plateC: "Plate C: Tourist Agent Prompt",
@@ -88,11 +114,34 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
       agentPrompt: "Agent Prompt",
       gumroadDesc: "Gumroad Description",
       copied: "copied to clipboard!",
-      estCost: "Est. Guest Cost"
+      estCost: "Est. Guest Cost",
+      whyRecommend: "Why I Recommend",
+      locationInfo: "Key Details",
+      timeInfo: "Time & Meeting Point",
+      pricingInfo: "Pricing & Costs",
+      hostFee: "Host Fee",
+      guestExpense: "Est. Guest Expense",
+      included: "Included",
+      maxGroup: "Max Group Size",
+      startDate: "Start Date",
+      duration: "Duration",
+      meetingPoint: "Meeting Point",
+      policiesTitle: "Policies & Important Notes",
+      policyVisitorCancel: "Visitor Cancel: Full refund up to 24h before",
+      policyVisitorPayment: "Visitor Payment: 100% Prepayment",
+      policyHostPayout: "Payout: Released after verifying 'Meetup Code'",
+      policyHostCancel: "Host Cancel: Must notify 48h in advance",
+      policyHostCancelPath: "How to Cancel: Contact Support via LINE"
     }
   };
 
   const labels = data.language === "Japan" ? LABELS.Japan : LABELS.Other;
+
+  // Collect all images for the Hero Gallery
+  // Prioritize user uploaded images (node.images), fall back to node.imageUrl (Unsplash)
+  const allImages = data.route.flatMap(node => node.images && node.images.length > 0 ? node.images : [node.imageUrl]).filter(Boolean);
+  // Take top 5 for the gallery
+  const heroImages = allImages.slice(0, 5);
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
@@ -172,30 +221,230 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
           className="overflow-hidden rounded-xl bg-white shadow-xl dark:bg-zinc-950 dark:text-zinc-100 border-2 border-orange-400 dark:border-orange-500 max-w-3xl mx-auto"
         >
           {/* Cover Header */}
-          <div className="bg-zinc-900 px-8 py-16 text-white text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-4 py-1.5 text-sm font-bold text-amber-400 uppercase tracking-wider border border-amber-500/30">
-              <Star className="h-4 w-4 fill-current" />
-              {labels.secretGuide}
+          <div className="bg-zinc-900 px-8 py-16 text-white">
+            {/* Hero Gallery (Host Uploaded Images) */}
+            {heroImages.length > 0 && (
+              <div className={`mb-16 grid gap-2 overflow-hidden rounded-2xl ${heroImages.length === 1 ? 'h-96 grid-cols-1' : 'h-96 grid-cols-4'}`}>
+                {heroImages.length === 1 ? (
+                   <div className="relative h-full w-full">
+                      <img src={heroImages[0]} className="h-full w-full object-cover" alt="Hero" />
+                   </div>
+                ) : (
+                   <>
+                      {/* Main Image */}
+                      <div className="col-span-2 row-span-2 relative">
+                          <img src={heroImages[0]} className="h-full w-full object-cover" alt="Hero 1" />
+                      </div>
+                      {/* Grid for others */}
+                      <div className="col-span-2 row-span-2 grid grid-cols-2 grid-rows-2 gap-2">
+                          {[1, 2, 3, 4].map(idx => (
+                              <div key={idx} className="relative overflow-hidden bg-zinc-800">
+                                  {heroImages[idx] && (
+                                     <img src={heroImages[idx]} className="h-full w-full object-cover" alt={`Hero ${idx+1}`} />
+                                  )}
+                              </div>
+                          ))}
+                      </div>
+                   </>
+                )}
+              </div>
+            )}
+
+            <div className="text-center mb-16">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-4 py-1.5 text-sm font-bold text-amber-400 uppercase tracking-wider border border-amber-500/30">
+                <Star className="h-4 w-4 fill-current" />
+                {labels.secretGuide}
+              </div>
+              <h1 className="mb-4 text-4xl font-black tracking-tight sm:text-5xl leading-tight">
+                {data.language === "Other" ? data.title.english : data.title.original}
+              </h1>
+              <p className="text-xl text-zinc-300 font-medium">
+                {data.language === "Other" ? data.title.original : data.title.english}
+              </p>
             </div>
-            <h1 className="mb-4 text-4xl font-black tracking-tight sm:text-5xl leading-tight">
-              {data.title.original}
-            </h1>
-            <p className="text-xl text-zinc-300 font-medium">
-              {data.title.english}
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-zinc-400">
-              <span>{labels.verifiedHost}</span>
-              <span>•</span>
-              <span>{labels.curatedRoute}</span>
-              <span>•</span>
-              <span>{labels.bilingualSupport}</span>
-              <span>•</span>
-              <span className="text-amber-400 font-bold">{labels.estCost}: {data.monetization.guestTotalCost}</span>
+
+            {/* 2. Recommendation Reasons */}
+            <div className="mb-16 max-w-3xl mx-auto">
+              <h3 className="text-amber-400 font-bold uppercase tracking-wider mb-6 text-center text-sm">
+                {labels.whyRecommend}
+              </h3>
+
+              {/* Theme Tags */}
+              {data.hostTags && data.hostTags.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-3 mb-8">
+                  {data.hostTags.map(tagValue => {
+                     const tagDef = THEME_TAGS.find(t => t.value === tagValue);
+                     const label = tagDef 
+                       ? (data.language === "Japan" ? tagDef.label.ja : tagDef.label.en)
+                       : tagValue;
+                     return (
+                       <span key={tagValue} className="px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/50 text-sm font-medium shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+                         {label}
+                       </span>
+                     )
+                  })}
+                </div>
+              )}
+
+              <div className="space-y-3 text-lg text-zinc-200 text-center leading-relaxed">
+                {data.details.recommendationReasons.map((reason, idx) => (
+                  <p key={idx} className="text-left md:text-center">{reason}</p>
+                ))}
+              </div>
+            </div>
+
+            {/* 2.5 About Host (Praise) */}
+            {data.details.hostPraise && (
+              <div className="mb-16 max-w-3xl mx-auto bg-zinc-800/50 p-8 rounded-xl border border-zinc-700">
+                 <div className="flex flex-col items-center text-center">
+                    <div className="mb-4 p-3 bg-amber-500/10 rounded-full">
+                        <Star className="w-6 h-6 text-amber-400 fill-current" />
+                    </div>
+                    <h3 className="text-amber-400 font-bold uppercase tracking-wider mb-4 text-sm">
+                      {labels.aboutHost}
+                    </h3>
+                    <p className="text-lg text-zinc-300 italic font-serif leading-relaxed">
+                      &quot;{data.details.hostPraise}&quot;
+                    </p>
+                 </div>
+              </div>
+            )}
+
+            {/* 3. Time & Location Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto mb-16 border-t border-b border-zinc-800 py-12">
+              {/* Location Column */}
+              <div className="space-y-6">
+                <h4 className="text-zinc-500 font-bold uppercase tracking-wider text-xs flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {labels.locationInfo}
+                </h4>
+                <div className="space-y-4">
+                   <div>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wide mb-1">Area</p>
+                      <p className="font-bold text-lg">{data.details.location}</p>
+                   </div>
+                   <div>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wide mb-1">{labels.maxGroup}</p>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-zinc-500" />
+                        <p className="font-bold text-lg">{data.details.maxGroupSize} People</p>
+                      </div>
+                   </div>
+                   <div>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wide mb-1">{labels.startDate}</p>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-zinc-500" />
+                        <p className="font-bold text-lg">{data.details.startDate}</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+              {/* Time Column */}
+              <div className="space-y-6">
+                <h4 className="text-zinc-500 font-bold uppercase tracking-wider text-xs flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  {labels.timeInfo}
+                </h4>
+                <div className="space-y-4">
+                   <div>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wide mb-1">{labels.duration}</p>
+                      <p className="font-bold text-lg">{data.details.duration}</p>
+                   </div>
+                   <div>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wide mb-1">Availability</p>
+                      <p className="font-bold text-lg">{data.details.availability}</p>
+                   </div>
+                   <div>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wide mb-1">{labels.meetingPoint}</p>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-zinc-500" />
+                        <p className="font-bold text-lg">{data.details.meetingPoint}</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Price */}
+            <div className="text-center max-w-2xl mx-auto bg-zinc-800/50 rounded-2xl p-8 border border-zinc-700/50">
+              <h4 className="text-zinc-400 font-bold uppercase tracking-wider text-xs mb-6 flex items-center justify-center gap-2">
+                <Coins className="h-4 w-4" />
+                {labels.pricingInfo}
+              </h4>
+              <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 items-center mb-6">
+                <div className="text-center">
+                   <p className="text-zinc-500 text-xs uppercase tracking-wide mb-1">{labels.hostFee}</p>
+                   <p className="text-2xl font-bold text-white">{data.monetization.meetupPrice}</p>
+                </div>
+                <div className="w-px h-12 bg-zinc-700 hidden sm:block"></div>
+                <div className="text-center">
+                   <p className="text-zinc-500 text-xs uppercase tracking-wide mb-1">{labels.guestExpense}</p>
+                   <p className="text-2xl font-bold text-zinc-300">{data.monetization.guestTotalCost}</p>
+                </div>
+              </div>
+              
+              {data.details.includedItems.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-zinc-700/50">
+                   <p className="text-zinc-500 text-xs uppercase tracking-wide mb-3">{labels.included}</p>
+                   <div className="flex flex-wrap justify-center gap-3">
+                      {data.details.includedItems.map((item, idx) => (
+                        <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">
+                          <CheckCircle className="h-3 w-3" />
+                          {item}
+                        </span>
+                      ))}
+                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Policies */}
+            <div className="mt-12 max-w-2xl mx-auto border-t border-zinc-800 pt-8 pb-8">
+               <h4 className="text-zinc-500 font-bold uppercase tracking-wider text-xs mb-6 flex items-center justify-center gap-2">
+                 <ShieldCheck className="h-4 w-4" />
+                 {labels.policiesTitle}
+               </h4>
+               <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                 <li className="flex items-start gap-3 bg-zinc-800/30 p-3 rounded-lg border border-zinc-800">
+                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500" />
+                   <span className="text-sm text-zinc-300">{labels.policyVisitorCancel}</span>
+                 </li>
+                 <li className="flex items-start gap-3 bg-zinc-800/30 p-3 rounded-lg border border-zinc-800">
+                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500" />
+                   <span className="text-sm text-zinc-300">{labels.policyVisitorPayment}</span>
+                 </li>
+                 <li className="flex items-start gap-3 bg-zinc-800/30 p-3 rounded-lg border border-zinc-800">
+                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-indigo-500" />
+                   <span className="text-sm text-zinc-300">{labels.policyHostPayout}</span>
+                 </li>
+                 <li className="flex items-start gap-3 bg-zinc-800/30 p-3 rounded-lg border border-zinc-800">
+                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500" />
+                   <span className="text-sm text-zinc-300">{labels.policyHostCancel}</span>
+                 </li>
+                 <li className="flex items-start gap-3 bg-zinc-800/30 p-3 rounded-lg border border-zinc-800 md:col-span-2">
+                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500" />
+                   <span className="text-sm text-zinc-300">{labels.policyHostCancelPath}</span>
+                 </li>
+               </ul>
             </div>
           </div>
 
           {/* Route Content */}
           <div className="px-8 py-12 bg-zinc-50 dark:bg-zinc-950">
+            
+            {/* Interactive Map */}
+            <div className="mb-12 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm">
+               <InteractiveMap locations={data.route.map(node => ({
+                 name: node.location,
+                 address: node.address,
+                 latitude: node.latitude || 0,
+                 longitude: node.longitude || 0,
+                 features: node.description,
+                 tags: node.tags
+               })).filter(l => l.latitude !== 0 && l.longitude !== 0)} />
+            </div>
+
             <div className="space-y-16 relative before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-0.5 before:bg-zinc-200 dark:before:bg-zinc-800">
               {data.route.map((node, idx) => (
                 <div key={idx} className="relative pl-12">
@@ -318,26 +567,6 @@ export function ItineraryPreview({ data }: ItineraryPreviewProps) {
                             >
                               {labels.openLocation}
                             </a>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Language Cards */}
-                      <div>
-                        <h6 className="mb-3 flex items-center gap-2 text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                          <Languages className="h-4 w-4 text-indigo-500" />
-                          {labels.languageCards}
-                        </h6>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <div className="rounded border border-zinc-200 p-3 dark:border-zinc-700">
-                            <p className="text-xs text-zinc-400 uppercase mb-1">{node.japaneseCards.askDirections.label}</p>
-                            <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{node.japaneseCards.askDirections.japanese}</p>
-                            <p className="text-xs text-zinc-500 italic">{node.japaneseCards.askDirections.romaji}</p>
-                          </div>
-                          <div className="rounded border border-zinc-200 p-3 dark:border-zinc-700">
-                            <p className="text-xs text-zinc-400 uppercase mb-1">{node.japaneseCards.askStaff.label}</p>
-                            <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{node.japaneseCards.askStaff.japanese}</p>
-                            <p className="text-xs text-zinc-500 italic">{node.japaneseCards.askStaff.romaji}</p>
                           </div>
                         </div>
                       </div>

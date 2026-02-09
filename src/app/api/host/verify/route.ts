@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { code, hostId } = await request.json();
+    const { code } = await request.json();
 
     if (!code) {
       return NextResponse.json(
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

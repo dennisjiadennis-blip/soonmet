@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 1. Visitor (访客/游客) 数据库
+model Visitor {
+  id                String   @id @default(uuid())
+  visitorId         String   @unique // 格式：TATAMI-VISITOR-XXXX
+  email             String   @unique
+  nickname          String?
+  loginStatus       Boolean  @default(false) // 登录状态
+  visitCount        Int      @default(0)     // 访问次数
+  location          String?  // 注册/最近访问的地理位置
+  preferredLanguage String   @default("en")  // 偏好语言
+  createdAt         DateTime @default(now())
+  
+  orders            Order[]
+}
+
+// 2. Host (伙伴) 数据库
+model Host {
+  id                String   @id @default(uuid())
+  buddyId           String?  @unique // 格式：TATAMI-BUDDY-JP-XXXX
+  
+  // 核心隐私信息
+  realName          String?
+  nickname          String
+  phone             String?
+  email             String   @unique
+  country           String?
+  gender            String?
+  ageRange          String?
+  
+  // 社交与支付 (L2-L4 升级用)
+  lineId            String?
+  whatsapp          String?
+  paypayId          String?
+  snsAccounts       String?  // SQLite doesn't support Json, storing as Stringified JSON
+  specialTags       String?  // SQLite doesn't support Json, storing as Stringified JSON
+  isIdentityVerified Boolean @default(false)
+  
+  // 等级与审核
+  level             Int      @default(0) // 0-5级
+  legendStatus      String   @default("NOT_APPLIED") // L5人工审核状态
+  
+  // 关联数据
+  guides            Guide[]
+  orders            Order[]
+  createdAt         DateTime @default(now())
+}
+
+// 3. Guide (攻略/项目) 数据库
+model Guide {
+  id                String   @id @default(uuid())
+  guideNumber       String?  @unique // Custom ID: Country + Date + Time + Sequence
+  title             String
+  content           String   // SQLite doesn't support db.Text, String is text
+  
+  // 状态流转
+  status            String   @default("PENDING")
+  // 状态值：UNDER_REVIEW (审核中), APPROVED (审核通过), COMPLETED (已结束/归档)
+  
+  hostId            String
+  host              Host     @relation(fields: [hostId], references: [id])
+  orders            Order[]
+  createdAt         DateTime @default(now())
+}
+
+// 4. Order (订单) 数据库
+model Order {
+  id                String   @id @default(uuid())
+  orderNumber       String   @unique
+  
+  // 状态流转
+  orderStatus       String   @default("WAITING")
+  // 状态值：WAITING (等待执行), EXECUTED (已经执行), SUBMITTED (已提交旅游平台)
+  
+  amount            Int      // 订单金额
+  meetingTime       DateTime
+  
+  hostId            String
+  host              Host     @relation(fields: [hostId], references: [id])
+  visitorId         String
+  visitor           Visitor  @relation(fields: [visitorId], references: [id])
+  guideId           String
+  guide             Guide    @relation(fields: [guideId], references: [id])
+  
+  createdAt         DateTime @default(now())
+}

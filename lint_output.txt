@@ -1,0 +1,66 @@
+
+> tokyo-travel-pro@0.2.0 lint
+> eslint
+
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/app/api/host/submit/route.ts
+  11:7  warning  'guestCostBreakdown' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  13:7  warning  'serviceFrequency' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/app/api/host/verify/route.ts
+   5:19  warning  'hostId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  35:12  warning  'error' is defined but never used            @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/app/dashboard/page.tsx
+   31:44  error  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  132:13  error  'nextDate' is never reassigned. Use 'const' instead  prefer-const
+  142:55  error  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  192:21  error  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/app/page.tsx
+    4:22  warning  'Search' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    4:91  warning  'MapPin' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   10:14  warning  'language' is assigned a value but never used                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   46:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   96:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  146:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/CreditSystem.tsx
+   5:68  warning  'AlertCircle' is defined but never used            @typescript-eslint/no-unused-vars
+   9:36  warning  'bio' is defined but never used                    @typescript-eslint/no-unused-vars
+   9:49  warning  'posts' is defined but never used                  @typescript-eslint/no-unused-vars
+  34:10  warning  'showAiResult' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/CreditTierCard.tsx
+  2:34  warning  'Clock' is defined but never used  @typescript-eslint/no-unused-vars
+  2:41  warning  'Zap' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/GeneratorForm.tsx
+     4:51  warning  'submitHostApplication' is defined but never used                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   341:7   warning  'COUNTRY_TO_LANG' is assigned a value but never used                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   441:6   warning  React Hook useEffect has a missing dependency: 'formData.guestCostBreakdown'. Either include it or remove the dependency array                                                                                                                                                           react-hooks/exhaustive-deps
+  1098:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  1274:11  warning  'minDateStr' is assigned a value but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  1903:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/ItineraryPreview.tsx
+  252:31  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  262:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/RegistrationView.tsx
+  4:28  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/TrustLevelProgress.tsx
+  4:38  warning  'Sparkles' is defined but never used   @typescript-eslint/no-unused-vars
+  4:67  warning  'UserCheck' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/ui/calendar.tsx
+  54:25  warning  'props' is defined but never used  @typescript-eslint/no-unused-vars
+  55:26  warning  'props' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/dennisjia/agent001/tokyo-travel-pro/src/components/upgrade/Level2UpgradeFlow.tsx
+  15:10  warning  'connectedProvider' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 34 problems (4 errors, 30 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

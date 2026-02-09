@@ -8,9 +8,7 @@ export async function POST(request: Request) {
     const { 
       title, 
       locations, 
-      guestCostBreakdown, 
       payoutId, 
-      serviceFrequency, 
       earliestServiceDate, 
       standards,
       hostProfile

@@ -1,61 +1,53 @@
-
 "use client";
 
 import Link from 'next/link';
-import { MapPin, Globe } from 'lucide-react';
+import { Menu, User, Clock, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function Navbar() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
   const toggleLanguage = () => {
     setLanguage(language === "ja" ? "en" : "ja");
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-            <MapPin className="h-5 w-5" />
+    <nav className="sticky top-0 z-50 w-full bg-[#0a0a16]/90 backdrop-blur-md border-b border-white/5">
+      <div className="mx-auto flex h-14 items-center justify-between px-4">
+        {/* Left: Logo */}
+        <Link href="/" className="group">
+          <div className="flex flex-col items-start">
+            <span className="text-xl font-bold tracking-tight text-white">
+              LocalVibe
+            </span>
+            <div className="h-[2px] w-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] rounded-full mt-0.5 opacity-80"></div>
           </div>
-          <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-            localfriend
-          </span>
         </Link>
         
-        <div className="flex items-center gap-6">
-          <Link 
-            href="/dashboard" 
-            className="text-sm font-medium text-zinc-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400"
-          >
-            {t("nav.personal_center")}
-          </Link>
-          <Link 
-            href="/gallery" 
-            className="text-sm font-medium text-zinc-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400"
-          >
-            {t("nav.gallery")}
-          </Link>
-          <Link 
-            href="/about" 
-            className="text-sm font-medium text-zinc-600 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400"
-          >
-            {t("nav.about")}
-          </Link>
-          {/* <Link 
-            href="/dashboard" 
-            className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
-          >
-            {t("nav.dashboard")}
-          </Link> */}
-          
-          <button
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-1 bg-cyan-950/50 border border-cyan-500/30 rounded-full px-3 py-1 mr-2">
+            <Clock className="h-3 w-3 text-cyan-400" />
+            <span className="text-xs font-mono text-cyan-100">17:15 JST</span>
+          </div>
+
+          <button 
             onClick={toggleLanguage}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+            title="Switch Language"
           >
-            <Globe className="h-4 w-4" />
-            {language === "ja" ? "English" : "日本語"}
+            <Globe className="h-5 w-5" />
+          </button>
+
+          <Link 
+            href="/dashboard"
+            className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors relative"
+          >
+            <User className="h-6 w-6" />
+          </Link>
+
+          <button className="p-2 text-white/80 hover:bg-white/10 rounded-full transition-colors ml-1">
+            <Menu className="h-6 w-6" />
           </button>
         </div>
       </div>
