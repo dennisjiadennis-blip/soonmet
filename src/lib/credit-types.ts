@@ -44,19 +44,6 @@ export interface TierConfig {
 }
 
 export const TIER_CONFIG: Record<number, TierConfig> = {
-  0: {
-    maxPrice: 1000,
-    label: "Level 0",
-    title: "Newcomer",
-    description: "Simply register to publish guides. Share local spots you know well.",
-    avgWeeklyIncome: 0,
-    weeklyRevenue: "¥0",
-    upgradeTime: "0 min",
-    coreProcess: "Email Registration",
-    requirements: ["Email"],
-    commissionRate: 0.20,
-    guideSuggestion: "Authentic local spots, the more local the better."
-  },
   1: {
     maxPrice: 2000,
     label: "L1",

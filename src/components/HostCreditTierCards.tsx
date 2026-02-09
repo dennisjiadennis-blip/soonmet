@@ -170,11 +170,11 @@ export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail, onPro
     
     // UI-specific mappings
     const uiConfig: Record<number, { stars: number }> = {
-      0: { stars: 0 },
       1: { stars: 1 },
       2: { stars: 2 },
       3: { stars: 3 },
-      4: { stars: 5 }
+      4: { stars: 4 },
+      5: { stars: 5 }
     };
 
     const ui = uiConfig[level];
@@ -187,13 +187,13 @@ export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail, onPro
       coreProcess: t(`tier.${level}.process`),
       recommendationStars: ui.stars,
       guideSuggestion: t(`tier.${level}.suggestion`),
-      // Logic for locking: Unlocked for all except Level 4 (Maestro) which is Invitation Only
-      isLocked: level === 4,
+      // Logic for locking: Unlocked for all except Level 5 (Legend) which is Invitation Only
+      isLocked: level === 5,
       isCompleted: profile.level > level
     };
   };
 
-  const tiers = [0, 1, 2, 3, 4].map(level => getTierProps(level));
+  const tiers = [1, 2, 3, 4, 5].map(level => getTierProps(level));
 
   return (
     <div className="space-y-6">
