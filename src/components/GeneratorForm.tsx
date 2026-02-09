@@ -1107,8 +1107,15 @@ export function GeneratorForm({
           fullName: initialRealName || prev.hostProfile?.fullName || "",
           phone: initialPhone || prev.hostProfile?.phone || "",
           lineId: initialLineId || prev.hostProfile?.lineId || "",
+          whatsapp: initialWhatsapp || prev.hostProfile?.whatsapp || "",
+          universityName: initialUniversityName || prev.hostProfile?.universityName || "",
+          universityEmail: initialUniversityEmail || prev.hostProfile?.universityEmail || "",
           gender: (initialGender as 'male' | 'female') || prev.hostProfile?.gender,
           ageRange: initialAgeRange || prev.hostProfile?.ageRange,
+          sheerIdVerified: initialSheerIdVerified !== undefined ? initialSheerIdVerified : prev.hostProfile?.sheerIdVerified,
+          avatarUrl: initialAvatarUrl || prev.hostProfile?.avatarUrl,
+          isPublicIg: initialIsPublicIg !== undefined ? initialIsPublicIg : prev.hostProfile?.isPublicIg,
+          bio: initialBio || prev.hostProfile?.bio,
           preferredContactTime: preferredTime || prev.hostProfile?.preferredContactTime || "",
           specialTags: initialSpecialTags || prev.hostProfile?.specialTags || []
         }
@@ -1119,7 +1126,7 @@ export function GeneratorForm({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialData, initialEmail, initialNickname, initialCountry, initialRealName, initialPhone, initialLineId, initialGender, initialAgeRange, initialSnsAccounts, initialSpecialTags, setStep]);
+  }, [initialData, initialEmail, initialNickname, initialCountry, initialRealName, initialPhone, initialLineId, initialWhatsapp, initialUniversityName, initialUniversityEmail, initialGender, initialAgeRange, initialSheerIdVerified, initialAvatarUrl, initialIsPublicIg, initialBio, initialSnsAccounts, initialSpecialTags, setStep]);
 
   // Sync SNS State -> FormData
   useEffect(() => {
