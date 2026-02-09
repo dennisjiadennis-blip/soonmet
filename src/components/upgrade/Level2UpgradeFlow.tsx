@@ -6,7 +6,7 @@ import { Loader2, Facebook, Linkedin, Twitter, CheckCircle, Instagram, Upload, I
 import { AIEvaluationResult } from "@/lib/credit-types";
 
 interface Level2UpgradeFlowProps {
-  onComplete: (result: AIEvaluationResult) => void;
+  onComplete: (result: AIEvaluationResult, data: { avatarUrl: string; isPublicIg: boolean; realName: string }) => void;
   onCancel: () => void;
 }
 
@@ -168,7 +168,15 @@ export function Level2UpgradeFlow({ onComplete, onCancel }: Level2UpgradeFlowPro
              </div>
 
              <button 
-               onClick={() => onComplete(mockResult)}
+               onClick={() => {
+                 // Create a fake URL for the avatar since we don't have a backend
+                 const avatarUrl = avatar ? URL.createObjectURL(avatar) : "";
+                 onComplete(mockResult, {
+                   avatarUrl,
+                   isPublicIg,
+                   realName
+                 });
+               }}
                className="w-full rounded-lg bg-indigo-600 py-3 font-bold text-white hover:bg-indigo-700"
              >
                Confirm & Upgrade to Level 2

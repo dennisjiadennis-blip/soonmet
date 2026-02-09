@@ -21,6 +21,8 @@ export interface HostCreditProfile {
   isIdentityVerified: boolean; // Level 3
   isBiometricVerified: boolean; // Level 4 (or L3 video interview)
   socialMediaConnected: boolean; // Level 2
+  avatarUrl?: string; // Level 2
+  isPublicIg?: boolean; // Level 2
   legendStatus: "NOT_APPLIED" | "PENDING" | "APPROVED" | "REJECTED"; // Level 5
   aiEvaluation?: AIEvaluationResult;
   status?: HostStatus;

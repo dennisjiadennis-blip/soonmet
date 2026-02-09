@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { verifyVisitorCode } from "@/lib/generator";
 import { Plus, Map, Calendar, DollarSign, UserCheck, BarChart3, Clock, Wallet, CheckCircle2, Edit2, Mail, Phone, MessageCircle, MessageSquare, User, AlertCircle } from "lucide-react";
 import { HostCreditTierCards } from "./HostCreditTierCards";
@@ -50,6 +50,8 @@ interface HostProfile {
   snsAccounts?: string;
   specialTags?: string[];
   sheerIdVerified?: boolean;
+  avatarUrl?: string; // Level 2
+  isPublicIg?: boolean; // Level 2
 }
 
 export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, hostEmail, guides }: HostDashboardProps) {
@@ -63,7 +65,7 @@ export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, 
   const [editForm, setEditForm] = useState<Partial<HostProfile>>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
+  const fetchProfile = useCallback(() => {
     if (hostEmail) {
       fetch(`/api/host/profile?email=${hostEmail}`)
         .then(res => res.json())
@@ -75,6 +77,10 @@ export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, 
         .catch(err => console.error(err));
     }
   }, [hostEmail]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleEdit = () => {
     if (hostProfile) {
@@ -90,7 +96,9 @@ export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, 
             snsAccounts: hostProfile.snsAccounts,
             specialTags: hostProfile.specialTags,
             country: hostProfile.country,
-            gender: hostProfile.gender
+            gender: hostProfile.gender,
+            avatarUrl: hostProfile.avatarUrl,
+            isPublicIg: hostProfile.isPublicIg
         });
         setIsEditing(true);
     }
@@ -175,12 +183,22 @@ export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, 
         hostId={hostProfile?.hostId || "PENDING"}
         guideCount={hostProfile?.guideCount || 0}
         hostEmail={hostEmail}
+        onProfileUpdate={fetchProfile}
       />
 
       {/* Profile Details Section */}
       <div className="rounded-xl border border-white/10 bg-[#1a1a2e]/60 backdrop-blur-sm p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-white">{language === "ja" ? "プロフィール情報" : "Profile Details"}</h3>
+            <div className="flex items-center gap-3">
+              {hostProfile?.avatarUrl && (
+                <img 
+                  src={hostProfile.avatarUrl} 
+                  alt="Profile" 
+                  className="w-12 h-12 rounded-full object-cover border-2 border-white/10"
+                />
+              )}
+              <h3 className="text-lg font-bold text-white">{language === "ja" ? "プロフィール情報" : "Profile Details"}</h3>
+            </div>
             {!isEditing ? (
                 <button
                     onClick={handleEdit}

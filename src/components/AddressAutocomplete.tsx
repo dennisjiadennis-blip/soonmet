@@ -15,11 +15,13 @@ interface GooglePlaceDetails {
   place_id?: string;
   rating?: number;
   user_ratings_total?: number;
-  reviews?: google.maps.places.PlaceReview[];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  reviews?: any[]; // google.maps.places.PlaceReview[];
   types?: string[];
   website?: string;
   price_level?: number;
-  photos?: google.maps.places.PlacePhoto[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  photos?: any[]; // google.maps.places.PlacePhoto[];
 }
 
 interface AddressAutocompleteProps {

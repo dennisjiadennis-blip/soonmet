@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import { ItineraryPreview } from "@/components/ItineraryPreview";
 import { generateItinerary, GeneratedItinerary, GeneratorInput } from "@/lib/generator";
 import { 
-  X, Star, Home as HomeIcon, Wine, Utensils, 
-  GripHorizontal, Leaf, ShoppingBag, Search, User, Zap
+  X, Home as HomeIcon, 
+  User, Zap, Wine, Utensils, GripHorizontal, Leaf, ShoppingBag, Search
 } from "lucide-react";
 import Link from "next/link";
 

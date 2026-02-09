@@ -15,9 +15,10 @@ export interface HostCreditTierCardsProps {
   hostId?: string;
   guideCount?: number;
   hostEmail?: string;
+  onProfileUpdate?: () => void;
 }
 
-export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail }: HostCreditTierCardsProps) {
+export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail, onProfileUpdate }: HostCreditTierCardsProps) {
   const { t } = useLanguage();
   const [profile, setProfile] = useState<HostCreditProfile>({
     hostId: hostId || "PENDING",
@@ -35,7 +36,9 @@ export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail }: Hos
         ...prev,
         level: initialLevel as CreditLevel,
         hostId: hostId || prev.hostId,
-        maxPrice: TIER_CONFIG[initialLevel as keyof typeof TIER_CONFIG]?.maxPrice || 0
+        maxPrice: TIER_CONFIG[initialLevel as keyof typeof TIER_CONFIG]?.maxPrice || 0,
+        isIdentityVerified: (initialLevel as number) >= 3,
+        socialMediaConnected: (initialLevel as number) >= 2,
     }));
   }, [initialLevel, hostId]);
   
@@ -76,34 +79,84 @@ export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail }: Hos
         maxPrice: TIER_CONFIG[1].maxPrice
       }));
       
-      // Modal will close itself after animation via its own internal state
+      if (onProfileUpdate) onProfileUpdate();
       
     } catch (error) {
       console.error(error);
-      // alert("Activation failed. Please try again."); // Removed alert
-      throw error; // Re-throw so modal can display the error
+      throw error; 
     }
   };
 
-  const handleUpgradeComplete = (result?: AIEvaluationResult | string[]) => {
-    if (activeUpgradeFlow === 2 && result && !Array.isArray(result)) {
-       setProfile(prev => ({ ...prev, level: 2, maxPrice: TIER_CONFIG[2].maxPrice, socialMediaConnected: true, aiEvaluation: result as AIEvaluationResult }));
-    } else if (activeUpgradeFlow === 3) {
-       setProfile(prev => ({ 
-         ...prev, 
-         level: 3, 
-         maxPrice: TIER_CONFIG[3].maxPrice, 
-         isIdentityVerified: true,
-         specialTags: Array.isArray(result) ? result : []
-       }));
-    } else if (activeUpgradeFlow === 4) {
-       setProfile(prev => ({ 
-         ...prev, 
-         level: 4, 
-         maxPrice: TIER_CONFIG[4].maxPrice, 
-         isBiometricVerified: true
-       }));
+  const handleUpgradeComplete = async (
+    result?: AIEvaluationResult | string[],
+    data?: { avatarUrl: string; isPublicIg: boolean; realName: string }
+  ) => {
+    try {
+      if (!hostEmail) return;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let updatePayload: any = { email: hostEmail };
+
+      if (activeUpgradeFlow === 2 && result && !Array.isArray(result) && data) {
+         updatePayload = {
+           ...updatePayload,
+           level: 2,
+           fullName: data.realName,
+           avatarUrl: data.avatarUrl,
+           isPublicIg: data.isPublicIg,
+           aiEvaluation: result
+         };
+         
+         setProfile(prev => ({ 
+           ...prev, 
+           level: 2, 
+           maxPrice: TIER_CONFIG[2].maxPrice, 
+           socialMediaConnected: true, 
+           aiEvaluation: result as AIEvaluationResult,
+           avatarUrl: data.avatarUrl,
+           isPublicIg: data.isPublicIg
+         }));
+      } else if (activeUpgradeFlow === 3) {
+         updatePayload = {
+           ...updatePayload,
+           level: 3,
+           specialTags: Array.isArray(result) ? result : []
+         };
+
+         setProfile(prev => ({ 
+           ...prev, 
+           level: 3, 
+           maxPrice: TIER_CONFIG[3].maxPrice, 
+           isIdentityVerified: true,
+           specialTags: Array.isArray(result) ? result : []
+         }));
+      } else if (activeUpgradeFlow === 4) {
+         updatePayload = {
+           ...updatePayload,
+           level: 4
+         };
+
+         setProfile(prev => ({ 
+           ...prev, 
+           level: 4, 
+           maxPrice: TIER_CONFIG[4].maxPrice, 
+           isBiometricVerified: true
+         }));
+      }
+
+      // Persist to backend
+      await fetch('/api/host/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatePayload)
+      });
+
+      if (onProfileUpdate) onProfileUpdate();
+
+    } catch (e) {
+      console.error("Failed to save upgrade data", e);
     }
+    
     setActiveUpgradeFlow(null);
   };
 
@@ -198,10 +251,25 @@ export function HostCreditTierCards({ initialLevel = 0, hostId, hostEmail }: Hos
       {profile.level >= 2 && profile.aiEvaluation && (
         <div className="mt-8 rounded-xl border border-indigo-100 bg-indigo-50/50 p-6 dark:border-indigo-900/30 dark:bg-indigo-900/10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-indigo-100 rounded-lg dark:bg-indigo-900/50">
-              <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            {profile.avatarUrl ? (
+              <img 
+                src={profile.avatarUrl} 
+                alt="Host Avatar" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-indigo-200 dark:border-indigo-800"
+              />
+            ) : (
+              <div className="p-2 bg-indigo-100 rounded-lg dark:bg-indigo-900/50">
+                <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+            )}
+            <div>
+              <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100">AI Vibe Check Analysis</h3>
+              {profile.isPublicIg && (
+                <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-100 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">
+                  Instagram Connected
+                </span>
+              )}
             </div>
-            <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100">AI Vibe Check Analysis</h3>
             <div className="ml-auto text-xs text-zinc-500">
               ID: {profile.hostId}
             </div>

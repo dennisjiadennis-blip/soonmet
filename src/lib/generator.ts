@@ -47,7 +47,6 @@ export interface GeneratorInput {
   durationMinutes?: number; // New: Bokun Sync (calculated)
   bokunCategory?: string; // New: Bokun Category (mapped from tags)
   meetingPoint: string; // New: Meeting Point
-  // price: string; // Deprecated
   productPrice: string | number; // Digital Guide Price
   meetupPrice: string | number; // In-person Guide Price (Host Fee)
   
