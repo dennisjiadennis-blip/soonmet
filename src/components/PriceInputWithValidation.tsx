@@ -31,7 +31,7 @@ export function PriceInputWithValidation({
   step
 }: PriceInputWithValidationProps) {
   const { language } = useLanguage();
-  const config = TIER_CONFIG[currentLevel as CreditLevel] || TIER_CONFIG[0];
+  const config = TIER_CONFIG[currentLevel as CreditLevel] || TIER_CONFIG[1];
   const maxPrice = config.maxPrice;
 
   // Currency Conversion Logic

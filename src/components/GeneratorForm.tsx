@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { GeneratorInput, LocationInput } from "@/lib/generator";
 import { mapVibeToBokunCategory, parseDurationToMinutes } from "@/lib/bokun-mapper";
 import { THEME_TAGS } from "@/lib/theme-tags";
@@ -425,14 +425,14 @@ export function GeneratorForm({
   const [internalStep, setInternalStep] = useState<number>(0);
   const step = currentStep !== undefined ? currentStep : internalStep;
 
-  const setStep = (value: number | ((prev: number) => number)) => {
+  const setStep = useCallback((value: number | ((prev: number) => number)) => {
     const nextStep = typeof value === 'function' ? value(step) : value;
     if (onStepChange) {
       onStepChange(nextStep);
     } else {
       setInternalStep(nextStep);
     }
-  };
+  }, [step, onStepChange]);
 
   // const [isInclusionsOpen, setIsInclusionsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
