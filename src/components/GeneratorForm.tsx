@@ -2504,7 +2504,7 @@ export function GeneratorForm({
                     ) : (
                       <Sparkles className="h-5 w-5" />
                     )}
-                    <span className="font-bold">LocalVibe 智能餐厅分析 (AI Analyze)</span>
+                    <span className="font-bold">Local Insider 智能餐厅分析 (AI Analyze)</span>
                   </button>
                   <p className="mt-2 text-[10px] text-zinc-500 text-center">
                     {language === "ja" ? "店名と住所から、価格・雰囲気・紹介文を自動生成します" : "Auto-generate price, vibe, and narrative from name & address"}
@@ -3088,7 +3088,7 @@ export function GeneratorForm({
                          <span className="font-medium">{formatCurrency(Number(formData.meetupPrice || 0), language)}</span>
                       </div>
                       <div className="flex justify-between">
-                         <span className="text-zinc-500">LocalVibe Fee (10%):</span>
+                         <span className="text-zinc-500">Local Insider Fee (10%):</span>
                          <span className="text-zinc-500">+{formatCurrency(Math.round(Number(formData.meetupPrice || 0) * 0.1), language)}</span>
                       </div>
                       <div className="flex justify-between">

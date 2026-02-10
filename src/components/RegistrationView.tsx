@@ -94,7 +94,7 @@ export function RegistrationView({ onComplete }: RegistrationViewProps) {
             <Zap className="h-8 w-8" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-white">
-            {step === "email" ? "Join LocalVibe" : step === "otp" ? "Check your inbox" : "Complete Profile"}
+            {step === "email" ? "Join Local Insider" : step === "otp" ? "Check your inbox" : "Complete Profile"}
           </h2>
           <p className="mt-2 text-sm text-zinc-400">
             {step === "email" 

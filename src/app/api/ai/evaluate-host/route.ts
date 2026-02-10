@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     });
 
     const prompt = `
-    # Role: You are the Global Brand Curator for "Local Vibe". Your task is to audit Host applications and optimize their content for Western tourists.
+    # Role: You are the Global Brand Curator for "Local Insider". Your task is to audit Host applications and optimize their content for Western tourists.
 
     # 1. Grading & Pricing Logic
     Current Applicant Level: ${level || 'L2'}
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     A. Visual Audit (For L2 and above):
     Analyze the provided images (up to 3). Apply these weights:
     - Authenticity (40%): Are scenes real Japanese university life or streets?
-    - Aesthetics (30%): Comfortable composition? Unique Local Vibe (hidden alleys, local shops)?
+    - Aesthetics (30%): Comfortable composition? Unique Local Insider feel (hidden alleys, local shops)?
     - Compliance: STRICTLY NO Instagram IDs, QR codes, Pornography, Violence, or solicitation for off-platform transactions.
 
     B. Copywriting (For All Levels):

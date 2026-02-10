@@ -18,7 +18,7 @@ export function Navbar() {
         <Link href="/" className="group">
           <div className="flex flex-col items-start">
             <span className="text-xl font-bold tracking-tight text-white">
-              LocalVibe
+              Local Insider
             </span>
             <div className="h-[2px] w-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] rounded-full mt-0.5 opacity-80"></div>
           </div>

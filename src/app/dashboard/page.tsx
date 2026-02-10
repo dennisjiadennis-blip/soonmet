@@ -374,7 +374,7 @@ export default function DashboardPage() {
                     Start Your Host Journey
                   </h1>
                   <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-                    Join our community of local experts. Review our host tiers and standards below to understand how you can grow and earn with LocalVibe.
+                    Join our community of local experts. Review our host tiers and standards below to understand how you can grow and earn with Local Insider.
                   </p>
                 </div>
                 
@@ -387,7 +387,7 @@ export default function DashboardPage() {
                     onClick={() => setView("register")}
                     className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl text-lg hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg hover:shadow-cyan-500/25 flex items-center gap-2 group"
                   >
-                    <span>Join LocalVibe Now</span>
+                    <span>Join Local Insider Now</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>

@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LocalVibe",
+  title: "Local Insider",
   description: "VIBE LOCALs TRAVEL SMART",
 };
 
