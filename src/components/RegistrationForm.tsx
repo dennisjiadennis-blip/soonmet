@@ -5,15 +5,26 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useUser } from "@/contexts/UserContext";
 import { Mail, User, Globe, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 
-const TOP_COUNTRIES = [
-  "United States", "Spain", "France", "Thailand", "United Kingdom",
-  "Italy", "Australia", "Germany", "Japan", "China",
-  "Turkey", "Mexico", "Canada", "Hong Kong", "India",
-  "Austria", "Portugal", "Greece", "Malaysia", "Netherlands"
+const INSIDER_COUNTRIES = [
+  { name: "China", flag: "🇨🇳" },
+  { name: "Taiwan", flag: "🇹🇼" },
+  { name: "Thailand", flag: "🇹🇭" },
+  { name: "Malaysia", flag: "🇲🇾" },
+  { name: "Japan", flag: "🇯🇵" },
+  { name: "South Korea", flag: "🇰🇷" },
+  { name: "Australia", flag: "🇦🇺" },
+  { name: "New Zealand", flag: "🇳🇿" },
+  { name: "United Kingdom", flag: "🇬🇧" },
+  { name: "France", flag: "🇫🇷" },
+  { name: "Germany", flag: "🇩🇪" },
+  { name: "Italy", flag: "🇮🇹" },
+  { name: "Spain", flag: "🇪🇸" },
+  { name: "Switzerland", flag: "🇨🇭" },
+  { name: "Netherlands", flag: "🇳🇱" },
 ];
 
 export function RegistrationForm() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { login } = useUser();
   
   const [email, setEmail] = useState("");
@@ -137,10 +148,10 @@ export function RegistrationForm() {
                   onChange={(e) => setCountry(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 rounded-lg py-2.5 pl-10 pr-8 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300 appearance-none cursor-pointer hover:bg-black/60"
                 >
-                  <option value="" disabled>Select</option>
-                  {TOP_COUNTRIES.map((c) => (
-                    <option key={c} value={c} className="bg-zinc-900 text-white py-2">
-                      {c}
+                  <option value="" disabled>{language === 'ja' ? "選択してください" : "Select Country"}</option>
+                  {INSIDER_COUNTRIES.map((c) => (
+                    <option key={c.name} value={c.name} className="bg-zinc-900 text-white py-2">
+                      {c.flag} {c.name}
                     </option>
                   ))}
                 </select>

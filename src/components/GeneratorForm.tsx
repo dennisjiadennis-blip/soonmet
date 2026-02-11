@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { GeneratorInput, LocationInput } from "@/lib/generator";
+import { InsiderChatPreview } from "@/components/InsiderChatPreview";
 import { mapVibeToBokunCategory, parseDurationToMinutes } from "@/lib/bokun-mapper";
 import { THEME_TAGS } from "@/lib/theme-tags";
+import { GLOBAL_EXPERTISE_TAGS, COUNTRY_SPECIFIC_TAGS } from "@/lib/expertise-tags";
 import { Loader2, MapPin, Lightbulb, DollarSign, PenTool, Plus, Trash2, ArrowRight, ArrowLeft, Wallet, Globe, Clock, Mail, CheckCircle2, Calendar, ShieldCheck, Receipt, AlertTriangle, Info, QrCode, X, User, Phone, Sparkles, Flag, ChevronDown, Map, ZoomIn, Check, Search, Camera } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatCurrency, getCurrencySymbol } from "@/lib/currency";
@@ -61,16 +63,13 @@ const TEXTS = {
       bioHint: "※ AIが自動生成した「在地领路人」プロフィールがここに入ります",
     },
     stepLanguage: {
-      title: "ターゲット言語 (Target Language)",
-      label: "どの言語圏の旅行者をターゲットにしますか？",
-      next: "次へ：テーマ設定"
+      title: "Insiderの国・地域 (Insider Origin)",
+      label: "あなたが詳しい国や地域を選択してください（複数選択可）",
+      next: "次へ：専門知識の選択"
     },
-    step1: {
-      title: "ガイドのテーマ (Title)",
-      label: "観光客向けではない「フック」を作成してください",
-      bad: "悪い例：東京ガイド",
-      good: "良い例：秋叶原裏世界：レトロ模型店 + メイドカフェ + 英語OKなバー",
-      placeholder: "例：京都の夜：ジャズバーと深夜のラーメン",
+    stepExpertise: {
+      title: "専門知識の選択と設定",
+      label: "専門分野を選択し、それぞれの経験や写真を設定してください。",
       next: "次へ：スポット登録"
     },
     step2: {
@@ -215,16 +214,13 @@ const TEXTS = {
       bioHint: "* AI-generated 'Local Insider' profile will appear here",
     },
     stepLanguage: {
-      title: "Target Language",
-      label: "Which language speakers do you want to host?",
-      next: "Next: Guide Theme"
+      title: "Insider Origin",
+      label: "Where are you an Insider from? (Multiple selection)",
+      next: "Next: Select Expertise"
     },
-    step1: {
-      title: "Guide Theme (Title)",
-      label: "Choose or write a super attractive travel guide name",
-      bad: "Bad: \"Tokyo Guide\"",
-      good: "Good: \"Nakameguro Late Night: Craft Beer...\"",
-      placeholder: "e.g. Shibuya Back Alley Seafood...",
+    stepExpertise: {
+      title: "Select & Configure Expertise",
+      label: "Select your expertise tags and configure details for each one.",
       next: "Next: Add Stops"
     },
     step2: {
@@ -359,13 +355,263 @@ const TEXTS = {
 
 
 
-const TARGET_LANGUAGES = [
-  { value: "English", label: "English (英語)", icon: "🇺🇸" },
-  { value: "French", label: "French (フランス語)", icon: "🇫🇷" },
-  { value: "Spanish", label: "Spanish (スペイン語)", icon: "🇪🇸" },
-  { value: "Korean", label: "Korean (韓国語)", icon: "🇰🇷" },
-  { value: "Chinese", label: "Chinese (中国語)", icon: "🇨🇳" },
-  { value: "Any", label: "Any Visitor (AI Translated)", icon: "🤖" }
+const EXPLANATION_TEXTS: Record<string, string> = {
+  // English (Default)
+  en: "Turn your local expertise into a premium 7-day WhatsApp consulting service, reaching travelers via thousands of global platforms for a fixed professional fee per booking.",
+  
+  // Japanese
+  ja: "あなたの地域の専門知識を、プレミアムな7日間のWhatsAppコンサルティングサービスに変えましょう。数千ものグローバルプラットフォームを通じて旅行者にリーチし、予約ごとに固定のプロフェッショナル料金を獲得できます。",
+  
+  // Chinese (Simplified)
+  zh: "将您的本地专业知识转化为一项优质的 7 天 WhatsApp 咨询服务，通过数千个全球平台触达旅行者，并按每笔预订收取固定的专业费用。",
+  
+  // Korean
+  ko: "당신의 지역 전문 지식을 프리미엄 7일 WhatsApp 컨설팅 서비스로 전환하세요. 수천 개의 글로벌 플랫폼을 통해 여행자들에게 다가가고, 예약당 고정된 전문 비용을 받을 수 있습니다.",
+  
+  // Thai
+  th: "เปลี่ยนความเชี่ยวชาญในท้องถิ่นของคุณให้เป็นบริการให้คำปรึกษาทาง WhatsApp ระดับพรีเมียม 7 วัน เข้าถึงนักท่องเที่ยวผ่านแพลตฟอร์มระดับโลกหลายพันแห่งพร้อมรับค่าธรรมเนียมวิชาชีพคงที่ต่อการจอง",
+
+  // French
+  fr: "Transformez votre expertise locale en un service de consultation WhatsApp premium de 7 jours, touchant les voyageurs via des milliers de plateformes mondiales pour un tarif professionnel fixe par réservation.",
+
+  // Spanish
+  es: "Convierta su experiencia local en un servicio de consultoría premium de WhatsApp de 7 días, llegando a viajeros a través de miles de plataformas globales por una tarifa profesional fija por reserva.",
+
+  // Italian
+  it: "Trasforma la tua esperienza locale in un servizio di consulenza WhatsApp premium di 7 giorni, raggiungendo i viaggiatori tramite migliaia di piattaforme globali per una tariffa professionale fissa per prenotazione.",
+
+  // Dutch
+  nl: "Zet uw lokale expertise om in een premium 7-daagse WhatsApp-consultancydienst, waarmee u reizigers bereikt via duizenden wereldwijde platforms voor een vast professioneel tarief per boeking.",
+
+  // Greek
+  el: "Μετατρέψτε την τοπική σας εμπειρία σε μια premium 7ήμερη συμβουλευτική υπηρεσία WhatsApp, προσεγγίζοντας ταξιδιώτες μέσω χιλιάδων παγκόσμιων πλατφορμών για μια σταθερή επαγγελματική αμοιβή ανά κράτηση.",
+
+  // Portuguese
+  pt: "Transforme sua experiência local em um serviço de consultoria premium de WhatsApp de 7 dias, alcançando viajantes por meio de milhares de plataformas globais por uma taxa profissional fixa por reserva.",
+  
+  // German (Adding for completeness since it's a major language)
+  de: "Verwandeln Sie Ihr lokales Fachwissen in einen erstklassigen 7-tägigen WhatsApp-Beratungsservice, erreichen Sie Reisende über Tausende globaler Plattformen und erhalten Sie eine feste professionelle Gebühr pro Buchung.",
+
+  // Malay
+  ms: "Ubah kepakaran tempatan anda menjadi perkhidmatan perundingan WhatsApp premium selama 7 hari, menjangkau pelancong melalui ribuan platform global dengan bayaran profesional tetap bagi setiap tempahan."
+};
+
+const PRODUCT_INFO_LABEL: Record<string, string> = {
+  en: "View Detailed Product Introduction",
+  ja: "商品の詳細説明を見る",
+  zh: "查看详细产品介绍",
+  ko: "상세 제품 소개 보기",
+  th: "ดูรายละเอียดผลิตภัณฑ์",
+  fr: "Voir la présentation détaillée du produit",
+  es: "Ver introducción detallada del producto",
+  it: "Vedi introduzione dettagliata del prodotto",
+  nl: "Bekijk gedetailleerde productintroductie",
+  el: "Δείτε λεπτομερή παρουσίαση προϊόντος",
+  pt: "Ver introdução detalhada do produto",
+  de: "Detaillierte Produkteinführung ansehen",
+  ms: "Lihat Pengenalan Produk Terperinci"
+};
+
+const PRODUCT_INFO_ALERT: Record<string, string> = {
+  en: "Detailed product information coming soon",
+  ja: "詳細情報は準備中です",
+  zh: "详细产品信息即将推出",
+  ko: "상세 제품 정보는 곧 제공될 예정입니다",
+  th: "ข้อมูลผลิตภัณฑ์โดยละเอียดจะมาเร็วๆ นี้",
+  fr: "Informations détaillées sur le produit bientôt disponibles",
+  es: "Información detallada del producto próximamente",
+  it: "Informazioni dettagliate sul prodotto in arrivo",
+  nl: "Gedetailleerde productinformatie volgt binnenkort",
+  el: "Λεπτομερείς πληροφορίες προϊόντος σύντομα",
+  pt: "Informações detalhadas do produto em breve",
+  de: "Detaillierte Produktinformationen folgen in Kürze",
+  ms: "Maklumat produk terperinci akan datang tidak lama lagi"
+};
+
+const STEP2_TEXTS: Record<string, { title: string; label: string; globalEssentials: string; specificTags: string; experienceLabel: string; photosLabel: string; customExpertise: string; emptyState: string; experiencePlaceholder: string }> = {
+  en: {
+    title: "Select & Configure Expertise",
+    label: "Select your expertise tags and configure details for each one.",
+    globalEssentials: "Global Essentials",
+    specificTags: "Specific Tags",
+    experienceLabel: "Experience & Advice",
+    photosLabel: "Photos (Max 4)",
+    customExpertise: "Custom Expertise",
+    emptyState: "Select tags above to configure product details.",
+    experiencePlaceholder: "Share your experience and unique perspective on this topic..."
+  },
+  ja: {
+    title: "専門知識の選択と設定",
+    label: "専門分野を選択し、それぞれの経験や写真を設定してください。",
+    globalEssentials: "グローバル共通タグ",
+    specificTags: "限定タグ",
+    experienceLabel: "経験・アドバイス",
+    photosLabel: "写真 (最大4枚)",
+    customExpertise: "その他の専門分野",
+    emptyState: "上でタグを選択して、詳細設定を開始してください。",
+    experiencePlaceholder: "この分野に関するあなたの経験や、ゲストに提供できるユニークな視点を共有してください..."
+  },
+  zh: {
+    title: "选择并配置专业领域",
+    label: "选择您的专业标签并配置详细信息。",
+    globalEssentials: "全球通用标签",
+    specificTags: "特定标签",
+    experienceLabel: "经验与建议",
+    photosLabel: "照片 (最多4张)",
+    customExpertise: "自定义专业领域",
+    emptyState: "在上方选择标签以配置详细信息。",
+    experiencePlaceholder: "分享您在该领域的经验和独特见解..."
+  },
+  ko: {
+    title: "전문 분야 선택 및 구성",
+    label: "전문 분야 태그를 선택하고 세부 정보를 구성하세요.",
+    globalEssentials: "글로벌 필수 태그",
+    specificTags: "특정 태그",
+    experienceLabel: "경험 및 조언",
+    photosLabel: "사진 (최대 4장)",
+    customExpertise: "사용자 지정 전문 분야",
+    emptyState: "위에서 태그를 선택하여 세부 정보를 구성하세요.",
+    experiencePlaceholder: "이 주제에 대한 귀하의 경험과 독특한 관점을 공유해 주세요..."
+  },
+  th: {
+    title: "เลือกและกำหนดค่าความเชี่ยวชาญ",
+    label: "เลือกแท็กความเชี่ยวชาญของคุณและกำหนดรายละเอียด",
+    globalEssentials: "แท็กสากล",
+    specificTags: "แท็กเฉพาะ",
+    experienceLabel: "ประสบการณ์และคำแนะนำ",
+    photosLabel: "รูปภาพ (สูงสุด 4 รูป)",
+    customExpertise: "ความเชี่ยวชาญที่กำหนดเอง",
+    emptyState: "เลือกแท็กด้านบนเพื่อกำหนดรายละเอียด",
+    experiencePlaceholder: "แบ่งปันประสบการณ์และมุมมองที่เป็นเอกลักษณ์ของคุณในหัวข้อนี้..."
+  },
+  fr: {
+    title: "Sélectionner et Configurer l'Expertise",
+    label: "Sélectionnez vos tags d'expertise et configurez les détails.",
+    globalEssentials: "Essentiels Mondiaux",
+    specificTags: "Tags Spécifiques",
+    experienceLabel: "Expérience & Conseils",
+    photosLabel: "Photos (Max 4)",
+    customExpertise: "Expertise Personnalisée",
+    emptyState: "Sélectionnez des tags ci-dessus pour configurer les détails.",
+    experiencePlaceholder: "Partagez votre expérience et votre point de vue unique sur ce sujet..."
+  },
+  es: {
+    title: "Seleccionar y Configurar Experiencia",
+    label: "Seleccione sus etiquetas de experiencia y configure los detalles.",
+    globalEssentials: "Esenciales Globales",
+    specificTags: "Etiquetas Específicas",
+    experienceLabel: "Experiencia y Consejos",
+    photosLabel: "Fotos (Máx 4)",
+    customExpertise: "Experiencia Personalizada",
+    emptyState: "Seleccione etiquetas arriba para configurar detalles.",
+    experiencePlaceholder: "Comparta su experiencia y perspectiva única sobre este tema..."
+  },
+  it: {
+    title: "Seleziona e Configura Esperienza",
+    label: "Seleziona i tuoi tag di esperienza e configura i dettagli.",
+    globalEssentials: "Essenziali Globali",
+    specificTags: "Tag Specifici",
+    experienceLabel: "Esperienza e Consigli",
+    photosLabel: "Foto (Max 4)",
+    customExpertise: "Esperienza Personalizzata",
+    emptyState: "Seleziona tag sopra per configurare i dettagli.",
+    experiencePlaceholder: "Condividi la tua esperienza e prospettiva unica su questo argomento..."
+  },
+  nl: {
+    title: "Expertise Selecteren en Configureren",
+    label: "Selecteer uw expertise tags en configureer details.",
+    globalEssentials: "Wereldwijde Essentiële Tags",
+    specificTags: "Specifieke Tags",
+    experienceLabel: "Ervaring & Advies",
+    photosLabel: "Foto's (Max 4)",
+    customExpertise: "Aangepaste Expertise",
+    emptyState: "Selecteer tags hierboven om details te configureren.",
+    experiencePlaceholder: "Deel uw ervaring en unieke perspectief over dit onderwerp..."
+  },
+  el: {
+    title: "Επιλογή και Διαμόρφωση Εξειδίκευσης",
+    label: "Επιλέξτε τις ετικέτες εξειδίκευσής σας και διαμορφώστε τις λεπτομέρειες.",
+    globalEssentials: "Παγκόσμια Βασικά",
+    specificTags: "Ειδικές Ετικέτες",
+    experienceLabel: "Εμπειρία & Συμβουλές",
+    photosLabel: "Φωτογραφίες (Max 4)",
+    customExpertise: "Προσαρμοσμένη Εξειδίκευση",
+    emptyState: "Επιλέξτε ετικέτες παραπάνω για να διαμορφώσετε λεπτομέρειες.",
+    experiencePlaceholder: "Μοιραστείτε την εμπειρία και τη μοναδική σας οπτική σε αυτό το θέμα..."
+  },
+  pt: {
+    title: "Selecionar e Configurar Especialização",
+    label: "Selecione suas tags de especialização e configure os detalhes.",
+    globalEssentials: "Essenciais Globais",
+    specificTags: "Tags Específicas",
+    experienceLabel: "Experiência e Conselhos",
+    photosLabel: "Fotos (Máx 4)",
+    customExpertise: "Especialização Personalizada",
+    emptyState: "Selecione tags acima para configurar detalhes.",
+    experiencePlaceholder: "Compartilhe sua experiência e perspectiva única sobre este tópico..."
+  },
+  de: {
+    title: "Fachwissen auswählen und konfigurieren",
+    label: "Wählen Sie Ihre Fachwissens-Tags aus und konfigurieren Sie Details.",
+    globalEssentials: "Globale Grundlagen",
+    specificTags: "Spezifische Tags",
+    experienceLabel: "Erfahrung & Beratung",
+    photosLabel: "Fotos (Max 4)",
+    customExpertise: "Benutzerdefiniertes Fachwissen",
+    emptyState: "Wählen Sie Tags oben aus, um Details zu konfigurieren.",
+    experiencePlaceholder: "Teilen Sie Ihre Erfahrung und einzigartige Perspektive zu diesem Thema..."
+  },
+  ms: {
+    title: "Pilih & Konfigurasi Kepakaran",
+    label: "Pilih tag kepakaran anda dan konfigurasikan butiran.",
+    globalEssentials: "Asas Global",
+    specificTags: "Tag Khusus",
+    experienceLabel: "Pengalaman & Nasihat",
+    photosLabel: "Gambar (Maks 4)",
+    customExpertise: "Kepakaran Tersuai",
+    emptyState: "Pilih tag di atas untuk mengkonfigurasi butiran.",
+    experiencePlaceholder: "Kongsikan pengalaman dan perspektif unik anda mengenai topik ini..."
+  }
+};
+
+const COUNTRY_TO_LANG_CODE: Record<string, string> = {
+  "Japan": "ja",
+  "China": "zh",
+  "Taiwan": "zh",
+  "South Korea": "ko",
+  "Thailand": "th",
+  "France": "fr",
+  "Spain": "es",
+  "Italy": "it",
+  "Netherlands": "nl",
+  "Greece": "el",
+  "Portugal": "pt",
+  "Germany": "de",
+  "Malaysia": "ms",
+  // English defaults
+  "United States": "en",
+  "United Kingdom": "en",
+  "Australia": "en",
+  "New Zealand": "en"
+};
+
+const INSIDER_REGIONS = [
+  { value: "United States", label: "United States (アメリカ)", icon: "🇺🇸" },
+  { value: "Japan", label: "Japan (日本)", icon: "🇯🇵" },
+  { value: "China", label: "China (中国)", icon: "🇨🇳" },
+  { value: "Taiwan", label: "Taiwan (台湾)", icon: "🇹🇼" },
+  { value: "South Korea", label: "South Korea (韓国)", icon: "🇰🇷" },
+  { value: "Thailand", label: "Thailand (タイ)", icon: "🇹🇭" },
+  { value: "Malaysia", label: "Malaysia (マレーシア)", icon: "🇲🇾" },
+  { value: "United Kingdom", label: "United Kingdom (英国)", icon: "🇬🇧" },
+  { value: "France", label: "France (フランス)", icon: "🇫🇷" },
+  { value: "Spain", label: "Spain (スペイン)", icon: "🇪🇸" },
+  { value: "Italy", label: "Italy (イタリア)", icon: "🇮🇹" },
+  { value: "Netherlands", label: "Netherlands (オランダ)", icon: "🇳🇱" },
+  { value: "Greece", label: "Greece (ギリシャ)", icon: "🇬🇷" },
+  { value: "Portugal", label: "Portugal (ポルトガル)", icon: "🇵🇹" },
+  { value: "Australia", label: "Australia (オーストラリア)", icon: "🇦🇺" },
+  { value: "New Zealand", label: "New Zealand (NZ)", icon: "🇳🇿" }
 ];
 
 const TOP_COUNTRIES = [
@@ -419,7 +665,7 @@ export function GeneratorForm({
   currentStep,
   onStepChange
 }: GeneratorFormProps) {
-  const { language } = useLanguage(); // Global UI language
+  const { language, setLanguage } = useLanguage(); // Global UI language
   const [outputLanguage, setOutputLanguage] = useState<"Japan" | "Other">("Other"); // PDF Output Language (Default English)
   
   const [internalStep, setInternalStep] = useState<number>(0);
@@ -454,7 +700,7 @@ export function GeneratorForm({
   
   const [formData, setFormData] = useState<GeneratorInput>({
     title: "",
-    targetLanguage: ["English"], // Default
+    targetLanguage: ["United States"], // Default
     enableOfflineService: true, // Default to true
     locations: [],
     duration: "",
@@ -503,6 +749,16 @@ export function GeneratorForm({
       cancellationPolicy: "24h" // Default
     }
   });
+
+  // Derived state for target language code
+  const targetLangCode = useMemo(() => {
+    const languages = formData.targetLanguage || [];
+    // Use the LAST selected country to reflect the most recent user interaction
+    const selectedCountry = languages.length > 0 
+      ? languages[languages.length - 1] 
+      : "United States";
+    return COUNTRY_TO_LANG_CODE[selectedCountry] || "en";
+  }, [formData.targetLanguage]);
 
   // AI Title Generation State
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1128,6 +1384,20 @@ export function GeneratorForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData, initialEmail, initialNickname, initialCountry, initialRealName, initialPhone, initialLineId, initialWhatsapp, initialUniversityName, initialUniversityEmail, initialGender, initialAgeRange, initialSheerIdVerified, initialAvatarUrl, initialIsPublicIg, initialBio, initialSnsAccounts, initialSpecialTags, setStep]);
 
+  // Sync Language with Country Selection
+  useEffect(() => {
+    if (formData.targetLanguage && formData.targetLanguage.length > 0) {
+      const firstCountry = formData.targetLanguage[0];
+      if (firstCountry === "Japan") {
+        setLanguage("ja");
+        setOutputLanguage("Japan");
+      } else {
+        setLanguage("en");
+        setOutputLanguage("Other");
+      }
+    }
+  }, [formData.targetLanguage, setLanguage]);
+
   // Sync SNS State -> FormData
   useEffect(() => {
     setFormData(prev => ({
@@ -1160,7 +1430,7 @@ export function GeneratorForm({
 
   const t = TEXTS[language];
   const vibeTags = THEME_TAGS.map(t => ({
-    label: language === "ja" ? t.label.ja : t.label.en,
+    label: (targetLangCode === "ja" && t.label.ja) ? t.label.ja : ((targetLangCode === "zh" && t.label.zh) ? t.label.zh : t.label.en),
     value: t.value,
     category: t.category
   }));
@@ -1294,165 +1564,8 @@ export function GeneratorForm({
     setStep(3);
   };
 
-  const toggleThemeTag = (themeValue: string) => {
-    if (!themeValue) return;
-    
-    // Strong Reasons Templates
-    const TEMPLATES: Record<string, { en: string; ja: string }> = {
-      // 1. Taste & Price
-      "Super Cheap (Under 1000¥)": {
-        en: "Tokyo Budget Eats: Super Cheap Gems (Under 1000¥) with a Student",
-        ja: "東京バジェットグルメ：1000円以下の絶品店を大学生と巡る"
-      },
-      "Insanely Fresh": {
-        en: "Tokyo Fresh Catch: Insanely Fresh Seafood from Market to Table",
-        ja: "東京鮮度革命：築地・豊洲直送の極上食材を味わう旅"
-      },
-      "Authentic Local Taste": {
-        en: "Real Tokyo Flavor: Authentic Local Taste No Tourists Know",
-        ja: "本物の東京の味：観光客の知らない地元民の行きつけ"
-      },
-      "Spicy Lovers": {
-        en: "Tokyo Spice Challenge: Best Spicy Eats for Heat Lovers",
-        ja: "東京激辛探訪：辛党必見の旨辛グルメツアー"
-      },
-      "Masterpiece Dish": {
-        en: "One-Bite Wonder: Tokyo's Masterpiece Dishes You Must Try",
-        ja: "一口の感動：東京で絶対食べるべき至高の逸品"
-      },
-      "Generous Portions": {
-        en: "Tokyo Big Eats: Generous Portions for Hungry Travelers",
-        ja: "東京デカ盛り：腹ペコ旅行者のためのボリューム満点グルメ"
-      },
-      "Hidden Culinary Gem": {
-        en: "Secret Tokyo Eats: Hidden Culinary Gems with a Local Foodie",
-        ja: "東京隠れ家グルメ：食通のみぞ知る名店探し"
-      },
+  // Legacy theme tag logic removed
 
-      // 2. People & Vibe
-      "Eye Candy (Staff/Guests)": {
-        en: "Tokyo Trendy Spots: Eye Candy Staff & Guests Vibe",
-        ja: "東京トレンド最前線：美男美女が集まるおしゃれスポット"
-      },
-      "Super Friendly Owner": {
-        en: "Warm Tokyo: Meet the Super Friendly Owners of Local Shops",
-        ja: "人情東京：名物店主と語らう心温まるひととき"
-      },
-      "English/Chinese Friendly": {
-        en: "Language-Free Tokyo: English/Chinese Friendly Spots",
-        ja: "言葉の壁なし：英語・中国語OKな安心スポット巡り"
-      },
-      "Young Creative Crowd": {
-        en: "Tokyo Creative Scene: Hangout with Young Artists & Creators",
-        ja: "東京クリエイティブ：若き才能が集まる刺激的な場所"
-      },
-      "Fashionista Hub": {
-        en: "Style Tokyo: Where the Fashionistas & Trendsetters Go",
-        ja: "東京スタイル：ファッショニスタが出没するエリア散策"
-      },
-      "Social & Lively": {
-        en: "Social Tokyo: Lively Spots to Make New Friends",
-        ja: "社交的東京：新しい出会いがある賑やかなスポット"
-      },
-
-      // 3. Design & Pedigree
-      "Legendary Designer": {
-        en: "Tokyo Design Tour: Spaces by Legendary Architects",
-        ja: "東京建築巡礼：巨匠が手掛けた名建築と空間"
-      },
-      "Emerging Local Designer": {
-        en: "New Wave Design: Emerging Local Designers of Tokyo",
-        ja: "東京ニューウェーブ：新進気鋭のデザイナーを訪ねて"
-      },
-      "Century-Old History": {
-        en: "Timeless Tokyo: Century-Old Shops with Deep History",
-        ja: "老舗の東京：創業100年を超える歴史と物語"
-      },
-      "Instagrammable View": {
-        en: "Insta-Ready Tokyo: Most Photogenic & Instagrammable Spots",
-        ja: "映える東京：どこを撮っても絵になるフォトジェニックツアー"
-      },
-      "Brutalist / Minimalist": {
-        en: "Tokyo Minimalism: Brutalist & Minimalist Aesthetics",
-        ja: "東京ミニマリズム：極限まで削ぎ落とした美学に触れる"
-      },
-      "Analog & Vinyl": {
-        en: "Analog Tokyo: Vinyl Bars & Retro Vibes",
-        ja: "アナログ東京：レコードの音色に浸るレトロな時間"
-      },
-
-      // 4. Experience & Utility
-      "Artisan Spirit": {
-        en: "Tokyo Craftsmanship: Witness the Artisan Spirit",
-        ja: "東京の職人魂：一筋の道を極める匠の技"
-      },
-      "Perfect for Solo": {
-        en: "Solo Tokyo: Best Spots to Enjoy Alone",
-        ja: "ソロ活東京：一人でも最高に楽しめるスポット"
-      },
-      "Off the Beaten Path": {
-        en: "Deep Tokyo: Off the Beaten Path Adventures",
-        ja: "裏東京探検：ガイドブックには載らない穴場へ"
-      },
-      "Best Sunset Spot": {
-        en: "Golden Hour Tokyo: The Best Sunset Spots",
-        ja: "東京マジックアワー：夕日が最も美しく見える場所"
-      },
-      "Late Night Soul": {
-        en: "Midnight Tokyo: Late Night Sanctuaries for the Soul",
-        ja: "真夜中の東京：眠らない街の深夜の避難所"
-      },
-      "Limited Edition Only": {
-        en: "Exclusive Tokyo: Limited Edition Experiences Only Now",
-        ja: "今だけの東京：期間限定・数量限定の特別体験"
-      }
-    };
-
-    setFormData(prev => {
-      const currentTags = prev.hostProfile?.specialTags || [];
-      const isSelected = currentTags.includes(themeValue);
-      let newTags: string[];
-      
-      if (isSelected) {
-        newTags = currentTags.filter(t => t !== themeValue);
-      } else {
-        newTags = [...currentTags, themeValue];
-      }
-
-      const updates: Partial<typeof prev> = {};
-
-      // Update title only if selecting (adding) a new tag
-      if (!isSelected) {
-        // Fallback for custom tags or missing mappings
-        const defaultTemplate = {
-          en: `Tokyo ${themeValue}: Explore with a Local Student`,
-          ja: `東京の${themeValue}：現役大学生と巡るローカル体験`
-        };
-
-        const template = TEMPLATES[themeValue] || defaultTemplate;
-        const newTitle = language === "ja" ? template.ja : template.en;
-        updates.title = newTitle;
-        updates.theme = themeValue;
-      }
-
-      return {
-        ...prev,
-        ...updates,
-        hostProfile: {
-          ...prev.hostProfile!,
-          specialTags: newTags
-        }
-      };
-    });
-  };
-
-  // Auto-generate title on Step 2 entry if empty
-  useEffect(() => {
-    if (step === 2 && !formData.title && formData.hostProfile?.specialTags?.[0]) {
-      toggleThemeTag(formData.hostProfile.specialTags[0]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
 
   const handleMagicParse = async () => {
     if (!magicNotes.trim()) return;
@@ -1887,16 +2000,20 @@ export function GeneratorForm({
           </label>
           
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {TARGET_LANGUAGES.map((lang) => {
+            {INSIDER_REGIONS.map((lang) => {
               const isSelected = (formData.targetLanguage || []).includes(lang.value);
               return (
                 <button
                   key={lang.value}
                   onClick={() => {
                     const current = formData.targetLanguage || [];
-                    const newLanguages = current.includes(lang.value)
-                      ? current.filter(l => l !== lang.value)
-                      : [...current, lang.value];
+                    const isCurrentlySelected = current.includes(lang.value);
+                    
+                    // Enforce single-select logic:
+                    // If clicking the already selected country, do nothing (or toggle off if desired, but user asked for switch).
+                    // If clicking a new country, replace the selection entirely.
+                    const newLanguages = isCurrentlySelected ? [] : [lang.value];
+                    
                     setFormData({ ...formData, targetLanguage: newLanguages });
                   }}
                   className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-4 transition-all ${
@@ -1911,6 +2028,21 @@ export function GeneratorForm({
               );
             })}
           </div>
+
+          {/* Service Explanation Text */}
+          <div className="mt-6 rounded-lg bg-indigo-50 p-4 border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
+            <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">
+              {EXPLANATION_TEXTS[targetLangCode] || EXPLANATION_TEXTS["en"]}
+            </p>
+            <button 
+              type="button"
+              className="mt-3 flex items-center gap-1.5 text-xs font-bold text-indigo-700 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200 transition-colors"
+              onClick={() => alert(PRODUCT_INFO_ALERT[targetLangCode] || PRODUCT_INFO_ALERT["en"])}
+            >
+              <Info className="h-3.5 w-3.5" />
+              <span>{PRODUCT_INFO_LABEL[targetLangCode] || PRODUCT_INFO_LABEL["en"]}</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-between pt-4">
@@ -1921,7 +2053,7 @@ export function GeneratorForm({
             {t.step3.back}
           </button>
           <button
-            onClick={nextStep}
+            onClick={() => setStep(2)}
             disabled={!formData.targetLanguage || formData.targetLanguage.length === 0}
             className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -1933,7 +2065,7 @@ export function GeneratorForm({
     );
   }
 
-  // Step 2: Content Creation (Title)
+  // Step 2: Insider Product Details
   if (step === 2) {
     return (
       <div className="space-y-8 rounded-xl bg-white p-6 shadow-sm border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
@@ -1941,209 +2073,290 @@ export function GeneratorForm({
         {/* Header with Back Button */}
         <div className="flex items-start gap-3 border-b border-zinc-100 pb-6 dark:border-zinc-800">
           <button 
-            onClick={prevStep}
+            onClick={() => setStep(1)}
             className="mt-2 mr-1 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          
-          <div className="flex-1">
-             <div className="flex items-center gap-2 mb-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">2</div>
-                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                  {language === "ja" ? "旅のスタイル (Travel Type)" : "Travel Type"}
-                </span>
+          <div>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+              {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).title}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).label}
+            </p>
+          </div>
+        </div>
+
+        {/* Expertise Tag Selection */}
+        <div className="space-y-6">
+           {/* Global Essentials */}
+           <div className="space-y-3">
+             <div className="flex items-center gap-2">
+               <Globe className="h-4 w-4 text-indigo-500" />
+               <h4 className="font-bold text-zinc-800 dark:text-zinc-200">
+                 {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).globalEssentials}
+               </h4>
              </div>
+             <div className="flex flex-wrap gap-2">
+               {GLOBAL_EXPERTISE_TAGS.map((tag) => {
+                 const isSelected = (formData.specialTags || []).includes(tag.value);
+                 return (
+                   <button
+                     key={tag.id}
+                     onClick={() => {
+                       const current = formData.specialTags || [];
+                       const newTags = current.includes(tag.value)
+                         ? current.filter((t: string) => t !== tag.value)
+                         : [...current, tag.value];
+                       setFormData({ ...formData, specialTags: newTags });
+                     }}
+                     className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all text-left ${
+                       isSelected
+                         ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/50"
+                         : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                     }`}
+                   >
+                     {tag.label[targetLangCode] || tag.label.en}
+                   </button>
+                 );
+               })}
+             </div>
+           </div>
 
-             {/* Vibe Tags Selection - Now at Top */}
-             <div className="mb-6">
-                <div className="flex flex-col gap-4">
-                  {(["Taste & Price", "People & Vibe", "Design & Pedigree", "Experience & Utility"] as const).map((category) => {
-                    const style = {
-                      "Taste & Price": {
-                        dot: "bg-rose-400",
-                        base: "border-rose-100 bg-rose-50/50 text-rose-600 hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-900/10 dark:text-rose-400 dark:hover:border-rose-800",
-                        selected: "border-rose-500 bg-rose-100 text-rose-700 dark:border-rose-400 dark:bg-rose-900/50 dark:text-rose-300"
-                      },
-                      "People & Vibe": {
-                        dot: "bg-violet-400",
-                        base: "border-violet-100 bg-violet-50/50 text-violet-600 hover:border-violet-300 hover:bg-violet-100 dark:border-violet-900/30 dark:bg-violet-900/10 dark:text-violet-400 dark:hover:border-violet-800",
-                        selected: "border-violet-500 bg-violet-100 text-violet-700 dark:border-violet-400 dark:bg-violet-900/50 dark:text-violet-300"
-                      },
-                      "Design & Pedigree": {
-                        dot: "bg-blue-400",
-                        base: "border-blue-100 bg-blue-50/50 text-blue-600 hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/30 dark:bg-blue-900/10 dark:text-blue-400 dark:hover:border-blue-800",
-                        selected: "border-blue-500 bg-blue-100 text-blue-700 dark:border-blue-400 dark:bg-blue-900/50 dark:text-blue-300"
-                      },
-                      "Experience & Utility": {
-                        dot: "bg-emerald-400",
-                        base: "border-emerald-100 bg-emerald-50/50 text-emerald-600 hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400 dark:hover:border-emerald-800",
-                        selected: "border-emerald-500 bg-emerald-100 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-900/50 dark:text-emerald-300"
-                      }
-                    }[category];
+           {/* Country Specific Tags */}
+           {(formData.targetLanguage || []).map((country: string) => {
+             const tags = COUNTRY_SPECIFIC_TAGS[country];
+             if (!tags) return null;
+             
+             return (
+               <div key={country} className="space-y-3">
+                 <div className="flex items-center gap-2">
+                   <MapPin className="h-4 w-4 text-emerald-500" />
+                   <h4 className="font-bold text-zinc-800 dark:text-zinc-200">
+                     {country} {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).specificTags}
+                   </h4>
+                 </div>
+                 <div className="flex flex-wrap gap-2">
+                   {tags.map((tag) => {
+                     const isSelected = (formData.specialTags || []).includes(tag.value);
+                     return (
+                       <button
+                         key={tag.id}
+                         onClick={() => {
+                           const current = formData.specialTags || [];
+                           const newTags = current.includes(tag.value)
+                             ? current.filter((t: string) => t !== tag.value)
+                             : [...current, tag.value];
+                           setFormData({ ...formData, specialTags: newTags });
+                           
+                           if (!isSelected && tag.value.includes("Centuries-old Artisan")) {
+                             alert("💡 Pro Tip: Since you selected 'Centuries-old Artisan', consider adding a Tatami Labs video link to boost your profile!");
+                           }
+                         }}
+                         className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all text-left ${
+                           isSelected
+                             ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50"
+                             : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                         }`}
+                       >
+                         {tag.label[targetLangCode] || tag.label.en}
+                       </button>
+                     );
+                   })}
+                 </div>
+               </div>
+             );
+           })}
 
-                    return (
-                      <div key={category}>
-                        <div className="mb-1.5 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1">
-                          <span className={`w-1 h-1 rounded-full ${style.dot}`}></span>
-                          {category}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {vibeTags.filter(t => t.category === category).map((theme, index) => {
-                  const isSelected = formData.hostProfile?.specialTags?.includes(theme.value);
-                  return (
-                    <button
-                      key={theme.label}
-                      type="button"
-                      onClick={() => toggleThemeTag(theme.value)}
-                                className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-300 animate-in zoom-in-50 fade-in slide-in-from-bottom-2 ${
-                                  isSelected ? style.selected : style.base
-                                }`}
-                                style={{ animationDelay: `${index * 30}ms`, animationFillMode: 'both' }}
-                              >
-                                {theme.label}
-                                {isSelected && <span className="ml-1">✓</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+           {/* Custom Expertise Input */}
+           <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
+             <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
+               {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).customExpertise}
+             </label>
+             <div className="flex gap-2">
+               <input
+                 type="text"
+                 placeholder="Can't find your niche? Type your own expertise here"
+                 className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+                 onKeyDown={(e) => {
+                   if (e.key === 'Enter') {
+                     e.preventDefault();
+                     const val = (e.target as HTMLInputElement).value.trim();
+                     if (val) {
+                       const forbidden = ["sex", "escort", "adult", "xxx"];
+                       if (forbidden.some(word => val.toLowerCase().includes(word))) {
+                         alert("⚠️ This tag violates our community guidelines.");
+                         return;
+                       }
+                       const current = formData.specialTags || [];
+                       if (!current.includes(val)) {
+                         setFormData({ ...formData, specialTags: [...current, val] });
+                       }
+                       (e.target as HTMLInputElement).value = "";
+                     }
+                   }
+                 }}
+               />
+             </div>
+             <div className="flex flex-wrap gap-2 mt-3">
+               {(formData.specialTags || [])
+                 .filter((t: string) => 
+                   !GLOBAL_EXPERTISE_TAGS.some(g => g.value === t) && 
+                   !Object.values(COUNTRY_SPECIFIC_TAGS).flat().some(c => c.value === t)
+                 )
+                 .map((tag: string) => (
+                   <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700">
+                     {tag}
+                     <button
+                       onClick={() => {
+                         const current = formData.specialTags || [];
+                         setFormData({ ...formData, specialTags: current.filter((t: string) => t !== tag) });
+                       }}
+                       className="hover:text-red-500"
+                     >
+                       <X className="h-3 w-3" />
+                     </button>
+                   </span>
+                 ))
+               }
+             </div>
+           </div>
+        </div>
 
-                  {/* Custom Tag Input */}
+        <div className="h-px bg-zinc-100 dark:bg-zinc-800 my-8" />
+
+        {/* Product Details Section */}
+        {(!formData.specialTags || formData.specialTags.length === 0) ? (
+          <div className="text-center py-12 rounded-xl bg-zinc-50 border border-dashed border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
+            <p className="text-zinc-500 font-medium">
+              {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).emptyState}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            {formData.specialTags.map((tag: string, index: number) => {
+              // Find existing product data or use default
+              const product = (formData.insiderProducts || []).find(p => p.tag === tag) || { tag, description: "", photos: [] };
+              
+              return (
+                <div key={tag} className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                      {index + 1}
+                    </span>
+                    <h3 className="font-bold text-zinc-900 dark:text-white">{tag}</h3>
+                  </div>
+
+                  {/* Experience Description */}
+                  <div className="mb-6">
+                    <label className="mb-2 block text-xs font-bold uppercase text-zinc-500">
+                      {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).experienceLabel}
+                    </label>
+                    <textarea
+                      rows={4}
+                      className="w-full rounded-lg border border-zinc-300 bg-white p-3 text-sm focus:border-indigo-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-900"
+                      placeholder={(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).experiencePlaceholder}
+                      value={product.description}
+                      onChange={(e) => {
+                        const newDescription = e.target.value;
+                        const currentProducts = formData.insiderProducts || [];
+                        const existingIndex = currentProducts.findIndex(p => p.tag === tag);
+                        
+                        let newProducts;
+                        if (existingIndex >= 0) {
+                          newProducts = [...currentProducts];
+                          newProducts[existingIndex] = { ...newProducts[existingIndex], description: newDescription };
+                        } else {
+                          newProducts = [...currentProducts, { tag, description: newDescription, photos: [] }];
+                        }
+                        setFormData({ ...formData, insiderProducts: newProducts });
+                      }}
+                    />
+                  </div>
+
+                  {/* Photo Upload (Max 4) */}
                   <div>
-                    <div className="mb-1.5 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1">
-                        <span className="w-1 h-1 rounded-full bg-indigo-300 dark:bg-indigo-600"></span>
-                        {language === "ja" ? "その他 (Custom)" : "Custom"}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={customTheme}
-                        onChange={(e) => setCustomTheme(e.target.value)}
-                        placeholder={language === "ja" ? "その他のタグを入力..." : "Type custom tag..."}
-                        className="flex-1 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-xs focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            if (customTheme.trim()) {
-                              toggleThemeTag(customTheme.trim());
-                              setCustomTheme("");
-                            }
-                          }
-                        }}
-                      />
-                      <button
-                  type="button"
-                  onClick={() => {
-                    if (customTheme.trim()) {
-                      toggleThemeTag(customTheme.trim());
-                      setCustomTheme("");
-                    }
-                  }}
-                        className="rounded-full bg-indigo-100 px-4 py-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400"
-                      >
-                        {language === "ja" ? "追加" : "Add"}
-                      </button>
+                    <label className="mb-2 block text-xs font-bold uppercase text-zinc-500">
+                      {(STEP2_TEXTS[targetLangCode] || STEP2_TEXTS["en"]).photosLabel}
+                    </label>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                      {product.photos.map((photo, i) => (
+                        <div key={i} className="relative aspect-square overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
+                          <img src={photo} alt="Preview" className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newPhotos = product.photos.filter((_, idx) => idx !== i);
+                              const currentProducts = formData.insiderProducts || [];
+                              const existingIndex = currentProducts.findIndex(p => p.tag === tag);
+                              
+                              if (existingIndex >= 0) {
+                                const newProducts = [...currentProducts];
+                                newProducts[existingIndex] = { ...newProducts[existingIndex], photos: newPhotos };
+                                setFormData({ ...formData, insiderProducts: newProducts });
+                              }
+                            }}
+                            className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-red-500"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                      
+                      {product.photos.length < 4 && (
+                        <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-white hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+                          <Camera className="h-5 w-5 text-zinc-400" />
+                          <span className="mt-1 text-[10px] text-zinc-500">Upload</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length === 0) return;
+                              
+                              const newUrls = files.map(f => URL.createObjectURL(f));
+                              const currentPhotos = product.photos;
+                              const combined = [...currentPhotos, ...newUrls].slice(0, 4);
+                              
+                              const currentProducts = formData.insiderProducts || [];
+                              const existingIndex = currentProducts.findIndex(p => p.tag === tag);
+                              
+                              let newProducts;
+                              if (existingIndex >= 0) {
+                                newProducts = [...currentProducts];
+                                newProducts[existingIndex] = { ...newProducts[existingIndex], photos: combined };
+                              } else {
+                                newProducts = [...currentProducts, { tag, description: "", photos: combined }];
+                              }
+                              setFormData({ ...formData, insiderProducts: newProducts });
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>
-                
-                <p className="text-[10px] text-zinc-400 flex items-center gap-1 mt-4">
-                  <Sparkles className="h-3 w-3 text-indigo-400" />
-                  {language === "ja" ? "タグを選択するとAIがSEOに強いタイトルを生成します" : "Select tags to let AI generate SEO-optimized titles"}
-                </p>
-             </div>
-
-             {/* Generated Title Display - Now Below Tags */}
-             {formData.title && (
-               <div className="relative group animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-500 ease-out">
-                  <div className="mb-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    {t.step1.title}
-                  </div>
-                  <textarea
-                    required
-                    className="w-full bg-transparent text-3xl font-bold text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:ring-0 border-none p-0 dark:text-white pr-12 resize-none"
-                    placeholder={t.step1.placeholder}
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    rows={2}
-                  />
-                  
-                  <button
-                    type="button"
-                    onClick={generateTitleCandidates}
-                    disabled={isGeneratingTitle}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-indigo-500 hover:bg-indigo-50 rounded-full transition-colors disabled:opacity-50"
-                    title="Generate AI Titles"
-                  >
-                    {isGeneratingTitle ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-                  </button>
-
-                  <p className="mt-3 text-sm text-indigo-600 font-medium flex items-center gap-1.5 animate-pulse">
-                     <ChevronDown className="h-4 w-4" />
-                     {language === "ja" ? "このテーマで以下のコンテンツを作成します" : "Content below will be created for this theme"}
-                  </p>
-               </div>
-             )}
-
-             {/* AI Candidates Dropdown */}
-             {showTitleCandidates && titleCandidates.length > 0 && (
-               <div className="mt-4 rounded-xl border border-indigo-100 bg-white p-4 shadow-xl dark:border-indigo-900 dark:bg-zinc-800 animate-in zoom-in-95 duration-200">
-                 <div className="flex items-center justify-between mb-3">
-                   <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                     {language === "ja" ? "AI提案タイトル (クリックして適用)" : "AI Suggested Titles (Click to Apply)"}
-                   </span>
-                   <button onClick={() => setShowTitleCandidates(false)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
-                     <X className="h-4 w-4" />
-                   </button>
-                 </div>
-                 <div className="grid gap-3">
-                   {titleCandidates.map((c, i) => (
-                     <button
-                       key={i}
-                       type="button"
-                       onClick={() => animateTitleTyping(c.title)}
-                       className="text-left group relative overflow-hidden rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 hover:border-indigo-300 hover:bg-indigo-100 dark:border-indigo-900/30 dark:bg-indigo-900/10 dark:hover:border-indigo-700 transition-all"
-                     >
-                       <div className="flex items-start justify-between gap-2">
-                         <span className="font-bold text-sm text-indigo-900 dark:text-indigo-200">{c.title}</span>
-                         <span className="text-lg">{c.emoji}</span>
-                       </div>
-                       <p className="mt-1 text-[10px] text-indigo-600/80 dark:text-indigo-400 line-clamp-2">{c.seoLogic}</p>
-                     </button>
-                   ))}
-                 </div>
-               </div>
-             )}
+              );
+            })}
           </div>
-        </div>
-        
-        <div>
-          {/* Examples */}
-          <div className="mb-6 rounded-lg bg-zinc-50 p-4 text-xs text-zinc-500 dark:bg-zinc-900/50">
-            <div className="mb-1"><span className="font-bold text-zinc-400">{t.step1.bad}</span></div>
-            <div><span className="font-bold text-emerald-600">{t.step1.good}</span></div>
-          </div>
-        </div>
+        )}
 
-        <div className="flex justify-between pt-4">
+        {/* Footer Navigation */}
+        <div className="flex justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800">
           <button
-            onClick={prevStep}
+            onClick={() => setStep(1)}
             className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             {t.step3.back}
           </button>
           <button
-            onClick={() => {
-              if (formData.locations.length === 0) addLocation();
-              nextStep();
-            }}
-            disabled={!formData.title}
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setStep(3)}
+            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-700"
           >
-            {t.step1.next}
+            {t.stepExpertise.next}
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>
@@ -2151,14 +2364,60 @@ export function GeneratorForm({
     );
   }
 
+
   // Step 3: Stops (Immersive Mode)
   if (step === 3) {
+    // [Preview Mode Override] - Insider Chat Support Product Generation
+    const getTagLabel = (tagValue: string) => {
+       const globalTag = GLOBAL_EXPERTISE_TAGS.find(t => t.value === tagValue);
+       // @ts-ignore - Dynamic language access
+       if (globalTag) return globalTag.label[language] || globalTag.label.en;
+       const allCountryTags = Object.values(COUNTRY_SPECIFIC_TAGS).flat();
+       const countryTag = allCountryTags.find(t => t.value === tagValue);
+       // @ts-ignore - Dynamic language access
+       if (countryTag) return countryTag.label[language] || countryTag.label.en;
+       return tagValue;
+    };
+
+    const displayTags = (formData.specialTags || []).map(getTagLabel);
+
+    const displayExperience = (formData.insiderProducts || [])
+        .map(p => p.description)
+        .filter(Boolean)
+        .join("\n\n");
+
+    const displayImages = (formData.insiderProducts || [])
+        .flatMap(p => p.photos || []);
+
+    return (
+       <div className="space-y-6">
+          <InsiderChatPreview 
+             hostName={initialNickname || "Host"}
+             country={(formData.targetLanguage && formData.targetLanguage[0]) || "Japan"}
+             tags={displayTags}
+             experience={displayExperience || formData.hostProfile.bio || ""}
+             images={displayImages}
+             onBroadcast={() => alert("🚀 Global Broadcast Initiated! Product sent to Bókun Marketplace.")}
+          />
+          {/* Back Button to allow editing */}
+          <div className="flex justify-center mt-8">
+             <button 
+                onClick={() => setStep(2)}
+                className="text-zinc-400 hover:text-zinc-600 underline text-sm"
+             >
+                Back to Edit Expertise
+             </button>
+          </div>
+       </div>
+    );
+
+    // Original Code (Unreachable in Preview Mode)
     return (
       <div className="space-y-6 rounded-xl bg-white p-6 shadow-sm border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800">
         
         <div className="flex items-center gap-2 border-b border-zinc-100 pb-2 dark:border-zinc-800">
           <button 
-            onClick={prevStep}
+            onClick={() => setStep(2)}
             className="mr-1 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -2168,7 +2427,7 @@ export function GeneratorForm({
             <h3 className="font-bold text-zinc-900 dark:text-white">{t.step2.title}</h3>
             <div className="mt-1 rounded-md bg-indigo-50 px-2 py-1 dark:bg-indigo-900/30">
               <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 break-words">
-                {formData.title || "(No Title Selected - Please go back to Step 2)"}
+                {formData.title || "(No Title)"}
               </p>
             </div>
           </div>
@@ -2511,17 +2770,17 @@ export function GeneratorForm({
                   </p>
 
                   {/* AI Error Display */}
-                  {aiError && aiError.index === currentStopIndex && (
+                  {aiError?.index === currentStopIndex && (
                     <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300">
                        <div className="flex items-start gap-2">
                           <svg className="h-5 w-5 shrink-0 text-red-600 dark:text-red-400" viewBox="0 0 20 20" fill="currentColor">
                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
                           <div className="flex-1 text-sm">
-                             <p className="font-bold">{aiError.message}</p>
-                             {aiError.details && (
+                             <p className="font-bold">{aiError?.message}</p>
+                             {aiError?.details && (
                                 <a 
-                                  href={aiError.details}
+                                  href={aiError?.details}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="mt-1 block font-bold text-red-700 underline hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
@@ -2603,9 +2862,9 @@ export function GeneratorForm({
                   <p className="mb-2 text-[10px] text-zinc-500 dark:text-white">{t.step2.photosHint}</p>
                   
                   {/* Photo Error Message */}
-                   {photoError && photoError.index === currentStopIndex && (
+                   {photoError?.index === currentStopIndex && (
                     <div className="mb-3 rounded-md bg-red-50 p-2 text-xs text-red-600 border border-red-100 flex items-center justify-between">
-                       <span>{photoError.message}</span>
+                       <span>{photoError?.message}</span>
                        <div className="flex gap-2">
                           <button
                             type="button"
@@ -2623,7 +2882,7 @@ export function GeneratorForm({
                   )}
                   
                   {/* Explicit Fetch Button if Empty */}
-                  {(!currentLocation.images || currentLocation.images.length === 0) && !photoError && (
+                  {(!currentLocation.images || currentLocation.images?.length === 0) && !photoError && (
                      <div className="mb-3">
                        <button
                          type="button"
@@ -2874,7 +3133,7 @@ export function GeneratorForm({
               <X className="h-8 w-8" />
             </button>
             <img 
-              src={zoomedImage} 
+              src={zoomedImage || ""} 
               alt="Zoomed preview" 
               className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl object-contain animate-in fade-in zoom-in duration-300"
               onClick={(e) => e.stopPropagation()} 

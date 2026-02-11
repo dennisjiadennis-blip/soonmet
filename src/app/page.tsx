@@ -9,6 +9,7 @@ import {
   User, Zap, Wine, Utensils, GripHorizontal, Leaf, ShoppingBag, Search
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StoredGuide {
   id: string;
@@ -19,6 +20,7 @@ interface StoredGuide {
 }
 
 export default function Home() {
+  const { t } = useLanguage();
   const [guides, setGuides] = useState<StoredGuide[]>([]);
   const [selectedGuide, setSelectedGuide] = useState<GeneratedItinerary | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -130,10 +132,10 @@ export default function Home() {
         {/* Hero Text */}
         <div className="text-center mb-10 mt-4 max-w-4xl mx-auto">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] px-4">
-            Safe and Fun.
+            {t("home.hero.title")}
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl font-medium text-red-200/90 px-4 leading-relaxed max-w-3xl mx-auto">
-            The World&apos;s First Verified Student-to-Student Social Travel Community.
+            {t("home.hero.subtitle")}
           </p>
           
           <div className="mt-8 flex justify-center">

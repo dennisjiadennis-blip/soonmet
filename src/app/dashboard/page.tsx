@@ -378,10 +378,6 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 
-                <div className="mb-12">
-                  <HostCreditTierCards initialLevel={0} />
-                </div>
-
                 <div className="flex justify-center pb-20">
                   <button
                     onClick={() => setView("register")}

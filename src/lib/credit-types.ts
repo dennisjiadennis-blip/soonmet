@@ -45,12 +45,12 @@ export interface TierConfig {
 
 export const TIER_CONFIG: Record<number, TierConfig> = {
   1: {
-    maxPrice: 2000,
+    maxPrice: Infinity,
     label: "L1",
     title: "Basic Host",
     description: "Verified Student (.ac.jp). Minimal entry, basic authenticity.",
     avgWeeklyIncome: 2000, // Hourly rate ref
-    weeklyRevenue: "¥2,000/hr",
+    weeklyRevenue: "Uncapped",
     upgradeTime: "Instant",
     coreProcess: "SheerID + Basic Info",
     requirements: ["University Email (.ac.jp)", "Decent Nickname"],
@@ -58,12 +58,12 @@ export const TIER_CONFIG: Record<number, TierConfig> = {
     guideSuggestion: "Campus tours, cheap eats, student life experiences."
   },
   2: {
-    maxPrice: 3500,
+    maxPrice: Infinity,
     label: "L2",
     title: "Social Host",
     description: "Vibe verified. 3 authentic photos required. No stock photos.",
     avgWeeklyIncome: 3500, // Hourly rate ref
-    weeklyRevenue: "¥3,500/hr",
+    weeklyRevenue: "Uncapped",
     upgradeTime: "10 mins",
     coreProcess: "Visual Audit (3 Photos)",
     requirements: ["3 Authentic Photos", "Public Instagram", "Vibe Check"],
@@ -71,12 +71,12 @@ export const TIER_CONFIG: Record<number, TierConfig> = {
     guideSuggestion: "Craftsmanship experiences, familiar places, local eateries, art galleries."
   },
   3: {
-    maxPrice: 5000,
+    maxPrice: Infinity,
     label: "L3",
     title: "Verified Host",
     description: "Identity verified via Stripe. Highest legal trust level.",
     avgWeeklyIncome: 5000, // Hourly rate ref
-    weeklyRevenue: "¥5,000/hr",
+    weeklyRevenue: "Uncapped",
     upgradeTime: "1-2 days",
     coreProcess: "Stripe Identity",
     requirements: ["Real Name Consistency", "Legal Trust"],
@@ -84,12 +84,12 @@ export const TIER_CONFIG: Record<number, TierConfig> = {
     guideSuggestion: "Unique hobbies and skills: Manga, models, amateur theater, private artist visits."
   },
   4: {
-    maxPrice: 8000,
+    maxPrice: Infinity,
     label: "PRO",
     title: "Expert Host",
     description: "Tatami Labs linked. Cultural Translator capable of deep decoding.",
     avgWeeklyIncome: 8000, // Hourly rate ref
-    weeklyRevenue: "¥8,000/hr",
+    weeklyRevenue: "Uncapped",
     upgradeTime: "Invitation",
     coreProcess: "Tatami Labs Content",
     requirements: ["Cultural Translation", "Tatami Labs Feature"],

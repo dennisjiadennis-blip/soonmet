@@ -53,6 +53,13 @@ export interface GeneratorInput {
   // New: Cost Breakdown
   guestCostBreakdown: CostItem[];
   
+  // New: Insider Chat Support Products
+  insiderProducts?: {
+    tag: string;
+    description: string;
+    photos: string[];
+  }[];
+
   // New: Host Profile
   hostProfile: {
     email: string;
@@ -148,6 +155,8 @@ export interface GeneratedItinerary {
     original: string;
     english: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  hostProfile?: any;
   // New: Structured Details for Preview UI
   details: {
     recommendationReasons: string[];
@@ -426,7 +435,8 @@ ${distributionChannels && distributionChannels.length > 0 ? `\n\n**Also Availabl
       original: title,
       english: englishTitle
     },
-    hostTags: hostProfile.specialTags, // Pass host tags to output
+    hostProfile: hostProfile,
+    hostTags: hostProfile?.specialTags, // Pass host tags to output
     details: {
       recommendationReasons: recommendationReasons,
       location: `${toEnglish(validLocations[0]?.address || "Tokyo")}`,

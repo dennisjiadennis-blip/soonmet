@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { verifyVisitorCode } from "@/lib/generator";
-import { Plus, Map, Calendar, DollarSign, UserCheck, BarChart3, Clock, Wallet, CheckCircle2, Edit2, Mail, Phone, MessageCircle, MessageSquare, User, AlertCircle } from "lucide-react";
+import { Plus, Map, Calendar, DollarSign, UserCheck, BarChart3, Clock, Wallet, CheckCircle2, Edit2, Mail, Phone, MessageCircle, MessageSquare, User, AlertCircle, Globe, MapPin, X, Lightbulb } from "lucide-react";
 import { HostCreditTierCards } from "./HostCreditTierCards";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { THEME_TAGS } from "@/lib/theme-tags";
+import { GLOBAL_EXPERTISE_TAGS, COUNTRY_SPECIFIC_TAGS } from "@/lib/expertise-tags";
 
 interface GuideSummary {
   id: string;
@@ -177,15 +178,8 @@ export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, 
         </button>
       </div>
 
-      {/* Credit System & Grading */}
-      <HostCreditTierCards 
-        initialLevel={hostProfile?.currentLevel || 0}
-        hostId={hostProfile?.hostId || "PENDING"}
-        guideCount={hostProfile?.guideCount || 0}
-        hostEmail={hostEmail}
-        onProfileUpdate={fetchProfile}
-      />
-
+      {/* Credit System & Grading Removed */}
+      
       {/* Profile Details Section */}
       <div className="rounded-xl border border-white/10 bg-[#1a1a2e]/60 backdrop-blur-sm p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
@@ -274,6 +268,285 @@ export function HostDashboard({ onCreateGuide, onEditGuide, onSimulateApproval, 
                   />
               ) : (
                   <p className="text-sm font-semibold text-white">{hostProfile?.nickname || "--"}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Country */}
+          <div className="flex items-start gap-3 col-span-full">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800/50 text-zinc-400 border border-white/5">
+              <Globe className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                 <p className="text-xs font-medium text-zinc-400">{language === "ja" ? "国・地域" : "Country / Region"}</p>
+                 <span className="text-[10px] bg-cyan-900/30 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-500/20">Public</span>
+              </div>
+              {isEditing ? (
+                  <div className="space-y-6">
+                    {/* Multi-select Country Grid */}
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                      {[
+                        { name: "China", flag: "🇨🇳" },
+                        { name: "Taiwan", flag: "🇹🇼" },
+                        { name: "Thailand", flag: "🇹🇭" },
+                        { name: "Malaysia", flag: "🇲🇾" },
+                        { name: "Japan", flag: "🇯🇵" },
+                        { name: "South Korea", flag: "🇰🇷" },
+                        { name: "Australia", flag: "🇦🇺" },
+                        { name: "New Zealand", flag: "🇳🇿" },
+                        { name: "United Kingdom", flag: "🇬🇧" },
+                        { name: "France", flag: "🇫🇷" },
+                        { name: "Germany", flag: "🇩🇪" },
+                        { name: "Italy", flag: "🇮🇹" },
+                        { name: "Spain", flag: "🇪🇸" },
+                        { name: "Switzerland", flag: "🇨🇭" },
+                        { name: "Netherlands", flag: "🇳🇱" },
+                        { name: "Greece", flag: "🇬🇷" },
+                        { name: "Portugal", flag: "🇵🇹" },
+                        { name: "United States", flag: "🇺🇸" },
+                      ].map((c) => {
+                        // Parse current countries (stored as comma-separated string)
+                        const currentCountries = editForm.country ? editForm.country.split(",").map(s => s.trim()) : [];
+                        const isSelected = currentCountries.includes(c.name);
+                        
+                        return (
+                          <button
+                            key={c.name}
+                            onClick={() => {
+                              const newCountries = isSelected 
+                                ? currentCountries.filter(n => n !== c.name) 
+                                : [...currentCountries, c.name];
+                              handleInputChange("country", newCountries.join(", "));
+
+                              // Auto-scroll to the new country's tags if selecting
+                              if (!isSelected) {
+                                setTimeout(() => {
+                                  const element = document.getElementById(`tags-${c.name}`);
+                                  if (element) {
+                                    element.scrollIntoView({ behavior: "smooth", block: "center" });
+                                  } else {
+                                    // Fallback: scroll to the tags container if specific tag section not found (e.g. no tags yet)
+                                    document.getElementById("expertise-tags-container")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                  }
+                                }, 100);
+                              }
+                            }}
+                            className={`flex flex-col items-center justify-center gap-2 rounded-lg border p-3 transition-all ${
+                              isSelected
+                                ? "border-cyan-500 bg-cyan-950/30 text-cyan-400"
+                                : "border-white/10 bg-black/40 text-zinc-400 hover:bg-white/5"
+                            }`}
+                          >
+                            <span className="text-2xl">{c.flag}</span>
+                            <span className="text-xs font-medium text-center">{c.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Expertise Tags Section - Only shows when countries are selected */}
+                    {editForm.country && (
+                      <div id="expertise-tags-container" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6">
+                        
+                        {/* Global Essentials */}
+                        <div className="rounded-xl border border-indigo-500/20 bg-gradient-to-br from-indigo-900/10 to-purple-900/10 p-5 overflow-hidden relative">
+                          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                          
+                          <div className="flex items-center gap-3 mb-4 relative z-10">
+                            <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.2)]">
+                              <Globe className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-white text-base">
+                                {language === "ja" ? "グローバル共通タグ" : "Global Essentials"}
+                              </h4>
+                              <p className="text-xs text-indigo-200/60 font-medium mt-0.5">
+                                {language === "ja" ? "世界中で通用するスキル" : "Universal skills applicable everywhere"}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-2.5 relative z-10">
+                            {GLOBAL_EXPERTISE_TAGS.map((tag) => {
+                              const isSelected = (editForm.specialTags || []).includes(tag.value);
+                              return (
+                                <button
+                                  key={tag.id}
+                                  onClick={() => {
+                                    const current = editForm.specialTags || [];
+                                    const newTags = current.includes(tag.value)
+                                      ? current.filter((t: string) => t !== tag.value)
+                                      : [...current, tag.value];
+                                    setEditForm(prev => ({ ...prev, specialTags: newTags }));
+                                  }}
+                                  className={`group relative px-4 py-2 rounded-lg text-xs font-medium border transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 text-left flex items-center gap-2 overflow-hidden ${
+                                    isSelected
+                                      ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.25)]"
+                                      : "bg-zinc-900/40 text-zinc-400 border-white/5 hover:bg-indigo-900/20 hover:text-indigo-200 hover:border-indigo-500/30"
+                                  }`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isSelected ? "bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]" : "bg-zinc-600 group-hover:bg-indigo-400/50"}`}></span>
+                                  {language === "ja" && tag.label.zh ? tag.label.zh : tag.label.en}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Country Specific Tags */}
+                        {editForm.country.split(",").map(c => c.trim()).map(country => {
+                          const tags = COUNTRY_SPECIFIC_TAGS[country];
+                          if (!tags || tags.length === 0) return null;
+                          
+                          return (
+                            <div id={`tags-${country}`} key={country} className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-900/10 to-teal-900/10 p-5 overflow-hidden relative">
+                              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                              
+                              <div className="flex items-center gap-3 mb-4 relative z-10">
+                                <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                  <MapPin className="h-5 w-5" />
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-white text-base">
+                                    {country} {language === "ja" ? "限定タグ" : "Expertise"}
+                                  </h4>
+                                  <p className="text-xs text-emerald-200/60 font-medium mt-0.5">
+                                    {language === "ja" ? "地域特有の知識と経験" : "Local knowledge & specialities"}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex flex-wrap gap-2.5 relative z-10">
+                                {tags.map((tag) => {
+                                  const isSelected = (editForm.specialTags || []).includes(tag.value);
+                                  return (
+                                    <button
+                                      key={tag.id}
+                                      onClick={() => {
+                                        const current = editForm.specialTags || [];
+                                        const newTags = current.includes(tag.value)
+                                          ? current.filter((t: string) => t !== tag.value)
+                                          : [...current, tag.value];
+                                        setEditForm(prev => ({ ...prev, specialTags: newTags }));
+                                        
+                                        // Tatami Labs Video Logic
+                                        if (!isSelected && tag.value.includes("Centuries-old Artisan")) {
+                                          alert("💡 Pro Tip: Since you selected 'Centuries-old Artisan', consider adding a Tatami Labs video link to boost your profile!");
+                                        }
+                                      }}
+                                      className={`group relative px-4 py-2 rounded-lg text-xs font-medium border transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 text-left flex items-center gap-2 overflow-hidden ${
+                                        isSelected
+                                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+                                          : "bg-zinc-900/40 text-zinc-400 border-white/5 hover:bg-emerald-900/20 hover:text-emerald-200 hover:border-emerald-500/30"
+                                      }`}
+                                    >
+                                      <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isSelected ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-zinc-600 group-hover:bg-emerald-400/50"}`}></span>
+                                      {language === "ja" && tag.label.zh ? tag.label.zh : tag.label.en}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Custom Expertise Input */}
+                        <div className="rounded-xl border border-white/10 bg-black/20 p-5">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 rounded-lg bg-zinc-800 text-zinc-400 border border-white/5">
+                              <Lightbulb className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <label className="block font-bold text-white text-base">
+                                {language === "ja" ? "その他の専門分野" : "Custom Expertise"}
+                              </label>
+                              <p className="text-xs text-zinc-500 font-medium mt-0.5">
+                                {language === "ja" ? "独自のスキルを追加" : "Add your unique skills"}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col gap-4">
+                            <div className="relative group">
+                              <input
+                                type="text"
+                                placeholder={language === "ja" ? "例：ビンテージカメラ専門家" : "Type your own expertise here (e.g., 'Vintage Camera Specialist')"}
+                                className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-sm text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 placeholder-zinc-600 transition-all pl-11"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const val = (e.target as HTMLInputElement).value.trim();
+                                    if (val) {
+                                      // Simple validation check (mock)
+                                      const forbidden = ["sex", "escort", "adult", "xxx"];
+                                      if (forbidden.some(word => val.toLowerCase().includes(word))) {
+                                        alert("⚠️ This tag violates our community guidelines.");
+                                        return;
+                                      }
+                                      
+                                      const current = editForm.specialTags || [];
+                                      if (!current.includes(val)) {
+                                        setEditForm(prev => ({ ...prev, specialTags: [...current, val] }));
+                                      }
+                                      (e.target as HTMLInputElement).value = "";
+                                    }
+                                  }
+                                }}
+                              />
+                              <Plus className="absolute left-3.5 top-3.5 h-4 w-4 text-zinc-500 group-focus-within:text-cyan-400 transition-colors" />
+                              <div className="absolute right-3 top-3 px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-500 border border-zinc-700">
+                                Press Enter ↵
+                              </div>
+                            </div>
+
+                            {/* Display Custom Tags */}
+                            {(editForm.specialTags || []).filter((t: string) => 
+                                !GLOBAL_EXPERTISE_TAGS.some(g => g.value === t) && 
+                                !Object.values(COUNTRY_SPECIFIC_TAGS).flat().some(c => c.value === t)
+                              ).length > 0 && (
+                              <div className="flex flex-wrap gap-2 p-3 rounded-lg bg-black/20 border border-white/5">
+                                {(editForm.specialTags || [])
+                                  .filter((t: string) => 
+                                    !GLOBAL_EXPERTISE_TAGS.some(g => g.value === t) && 
+                                    !Object.values(COUNTRY_SPECIFIC_TAGS).flat().some(c => c.value === t)
+                                  )
+                                  .map((tag: string) => (
+                                    <span key={tag} className="group inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-lg text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700 transition-colors hover:border-zinc-500">
+                                      {tag}
+                                      <button
+                                        onClick={() => {
+                                          const current = editForm.specialTags || [];
+                                          setEditForm(prev => ({ ...prev, specialTags: current.filter((t: string) => t !== tag) }));
+                                        }}
+                                        className="p-0.5 rounded-full hover:bg-red-500/20 hover:text-red-400 transition-all opacity-60 group-hover:opacity-100"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    </span>
+                                  ))
+                                }
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    )}
+                  </div>
+              ) : (
+                  <div>
+                    <p className="text-sm font-semibold text-white mb-2">{hostProfile?.country || "--"}</p>
+                    {hostProfile?.specialTags && hostProfile.specialTags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {hostProfile.specialTags.map(tag => (
+                          <span key={tag} className="inline-flex px-2 py-0.5 rounded text-[10px] font-medium bg-cyan-950/40 text-cyan-400 border border-cyan-500/20">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
               )}
             </div>
           </div>

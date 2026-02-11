@@ -50,8 +50,8 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     
     // Homepage
     "home.ai_active": "AI Agent Active",
-    "home.hero.title": "Find a Local Insider at your destination, make travel easier and more fun.",
-    "home.hero.subtitle": "Your intelligent travel companion connecting you with local experts and hidden gems.",
+    "home.hero.title": "Local Insider",
+    "home.hero.subtitle": "I’m the Local. I’m the Insider. Ask me anything.",
     "home.visitor.title": "Find Your Vibe",
     "home.visitor.desc": "Let our AI agent match you with the perfect local host based on your interests.",
     "home.visitor.cta": "Start Exploring",
@@ -70,7 +70,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "reg.desc": "Connect with the community. Verify your identity to start.",
     "reg.email": "Gmail Address",
     "reg.nickname": "Nickname",
-    "reg.country": "Country",
+    "reg.country": "I am an Insider from",
     "reg.submit": "Verify & Join",
     "reg.gmail_error": "Please use a valid @gmail.com address",
     "reg.welcome": "Welcome back, ",
@@ -184,8 +184,8 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     
     // Homepage
     "home.ai_active": "AIエージェント稼働中",
-    "home.hero.title": "旅先でLocal Insiderを見つけて、旅をもっと手軽に、もっと楽しく。",
-    "home.hero.subtitle": "AIエージェントが、あなたにぴったりのローカル体験とホストをマッチングします。",
+    "home.hero.title": "Local Insider",
+    "home.hero.subtitle": "I’m the Local. I’m the Insider. Ask me anything.",
     "home.visitor.title": "旅を始める",
     "home.visitor.desc": "AIがあなたの好みを分析し、最適なホストとプランを提案します。",
     "home.visitor.cta": "探索する",
@@ -204,7 +204,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "reg.desc": "コミュニティとつながりましょう。本人確認をして始めましょう。",
     "reg.email": "Gmailアドレス",
     "reg.nickname": "ニックネーム",
-    "reg.country": "国・地域",
+    "reg.country": "私はどこの国のInsiderですか",
     "reg.submit": "認証して参加",
     "reg.gmail_error": "有効な@gmail.comアドレスを使用してください",
     "reg.welcome": "おかえりなさい、",
