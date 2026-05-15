@@ -188,9 +188,9 @@ export default function VerifyPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#1a1512] flex flex-col items-center p-4 relative pb-20 pt-24">
+    <main className="min-h-screen flex flex-col items-center p-4 relative pb-20 pt-24">
        {/* Background */}
-       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#1a1512_100%)] pointer-events-none" />
+       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)] pointer-events-none" />
        
        <div className="w-full max-w-3xl relative z-10">
          <div className="mb-8 text-center">
@@ -297,7 +297,13 @@ export default function VerifyPage() {
                    />
                  </div>
                  <p className="text-xs text-zinc-500 mt-1">We'll fetch your top 3 public photos for your visual profile.</p>
-               </div>
+                <div className="mt-2 p-3 bg-indigo-900/30 border border-indigo-500/30 rounded-lg">
+                  <p className="text-xs text-indigo-200 font-medium flex items-start gap-2">
+                    <span className="mt-0.5">⚠️</span>
+                    Important: You must follow our official account @soonmet_official to allow our AI to access your public posts.
+                  </p>
+                </div>
+              </div>
 
                <button
                  onClick={handleAnalyze}

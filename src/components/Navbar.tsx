@@ -2,17 +2,25 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, UserPlus, Calendar, Home, LogIn, Menu, User, Repeat, LogOut, CheckCircle } from "lucide-react";
+import { Compass, UserPlus, Calendar, Home, Menu, User, Repeat, LogOut, CheckCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, logout, setShowLoginModal, userRole } = useAuth();
   const [userMode, setUserMode] = useState<'visitor' | 'host'>('visitor');
   const [showMenu, setShowMenu] = useState(false);
   const [isVerifiedHost, setIsVerifiedHost] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Sync local userMode with auth context role if available
+    if (userRole) {
+      setUserMode(userRole);
+    }
+  }, [userRole]);
 
   useEffect(() => {
     const verified = localStorage.getItem('soonmet_is_verified_host') === 'true';
@@ -31,12 +39,7 @@ export function Navbar() {
   }, []);
 
   const handleLogin = () => {
-    // Simulate Gmail Login
-    const confirmLogin = window.confirm("Simulate Login with Gmail?\n(This will merge your Visitor and Host identities)");
-    if (confirmLogin) {
-      setIsLoggedIn(true);
-      // Simulate fetching user profile which has both roles
-    }
+    setShowLoginModal(true);
   };
 
   const toggleMode = () => {
@@ -72,31 +75,31 @@ export function Navbar() {
   const currentNavItems = userMode === 'visitor' ? visitorNavItems : hostNavItems;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/20 bg-[#637C88]/90 backdrop-blur-md supports-[backdrop-filter]:bg-[#637C88]/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-rose-500">
-            SoonMet
-          </span>
-        </Link>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-sky-500/95 backdrop-blur-md supports-[backdrop-filter]:bg-sky-500/90 shadow-sm transition-all duration-300">
+      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-xl font-bold text-white tracking-tight drop-shadow-sm">
+              AskALocal
+            </span>
+          </Link>
+        </div>
 
         <div className="flex items-center gap-2 sm:gap-6">
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-1">
             {currentNavItems.map((item) => {
-              const Icon = item.icon;
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  className={`relative flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-bold transition-all ${
                     isActive
-                      ? "bg-stone-100 text-stone-900 shadow-sm"
-                      : "text-stone-500 hover:bg-stone-50 hover:text-stone-800"
+                      ? "bg-white/20 text-white shadow-sm"
+                      : "text-sky-100 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
                   <span>{item.name}</span>
                 </Link>
               );
@@ -109,15 +112,14 @@ export function Navbar() {
               <>
                 <Link 
                   href="/verify"
-                  className="hidden sm:flex text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors"
+                  className="hidden sm:flex text-sm font-bold text-sky-100 hover:text-white transition-colors"
                 >
                   Become a Host
                 </Link>
                 <button
                   onClick={handleLogin}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900 text-white text-sm font-bold hover:bg-stone-800 transition-colors shadow-sm"
+                  className="flex items-center justify-center px-4 py-1.5 rounded-full bg-white text-sky-600 text-sm font-bold hover:bg-sky-50 transition-colors shadow-sm"
                 >
-                  <LogIn className="h-4 w-4" />
                   Log in
                 </button>
               </>
@@ -125,12 +127,12 @@ export function Navbar() {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 transition-all shadow-sm"
+                  className="flex items-center gap-2 px-3 py-1 rounded-full border border-sky-400 bg-sky-600/50 hover:bg-sky-600 transition-all shadow-sm"
                 >
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-orange-400 to-rose-400 flex items-center justify-center text-white font-bold text-xs">
+                  <div className="h-7 w-7 rounded-full bg-white flex items-center justify-center text-sky-600 font-bold text-xs">
                     DJ
                   </div>
-                  <Menu className="h-4 w-4 text-stone-500" />
+                  <Menu className="h-4 w-4 text-sky-100" />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -179,7 +181,7 @@ export function Navbar() {
 
                     <div className="border-t border-stone-100 pt-2">
                       <button 
-                        onClick={() => { setIsLoggedIn(false); setShowMenu(false); }}
+                        onClick={() => { logout(); setShowMenu(false); }}
                         className="w-full px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 hover:text-rose-600 flex items-center gap-3 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />

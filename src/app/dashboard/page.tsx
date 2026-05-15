@@ -87,7 +87,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Profile Header - Unified Identity */}
@@ -235,6 +235,27 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              
+              {/* Prominent Create Activity CTA */}
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-6 rounded-3xl border border-indigo-500/10">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-white dark:bg-zinc-800 rounded-full shadow-sm">
+                     <Sparkles className="w-6 h-6 text-indigo-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Create a New Activity</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">Share your world and earn money as a local host.</p>
+                  </div>
+                </div>
+                <Link 
+                  href="/host/apply"
+                  className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  Create Now
+                </Link>
+              </div>
+
               {/* Host Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Trust Score Card */}
@@ -388,7 +409,7 @@ function DashboardContent() {
                         ) : (
                           <>
                             <RefreshCw className="w-4 h-4" />
-                            {localStorage.getItem('soonmet_host_sns_url') ? 'Re-Scan for Updates' : 'Connect & Scan'}
+                            {urlInput ? 'Re-Scan for Updates' : 'Connect & Scan'}
                           </>
                         )}
                       </button>

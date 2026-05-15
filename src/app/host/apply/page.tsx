@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, MapPin, DollarSign, User, CheckCircle, Instagram, Sparkles, MessageSquare, Video, Wallet, ArrowRight, Coffee, ShoppingBag, Utensils, Footprints } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { MapPin, User, CheckCircle, Instagram, Sparkles, MessageSquare, Video, Wallet, ArrowRight, Coffee, ShoppingBag, Utensils, Footprints, Plus, Trash2, Clock, Image as ImageIcon } from "lucide-react";
 
 export default function BecomeHostPage() {
   const router = useRouter();
+  const { isLoggedIn, setShowLoginModal } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Auth Check
+  useEffect(() => {
+    // Small delay to allow hydration
+    const timer = setTimeout(() => {
+      if (!isLoggedIn) {
+        setShowLoginModal(true);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, setShowLoginModal]);
   const [isSuccess, setIsSuccess] = useState(false);
   
   // AI Copilot State
@@ -15,6 +28,8 @@ export default function BecomeHostPage() {
   // Instagram & AI State
   const [isConnectingInsta, setIsConnectingInsta] = useState(false);
   const [instaConnected, setInstaConnected] = useState(false);
+  const [hasFollowed, setHasFollowed] = useState(false);
+  const [showFollowCheck, setShowFollowCheck] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<null | {
     summary: string;
     strengths: string[];
@@ -25,14 +40,74 @@ export default function BecomeHostPage() {
   // Form State
   const [formData, setFormData] = useState({
     fullName: "",
-    tagline: "",
-    bio: "",
+    tagline: "✨ Connect Instagram to auto-generate your unique vibe.",
+    bio: "🚀 Connect your Instagram to let our AI analyze your vibe and craft a perfect bio for you. It's 10x faster and attracts more guests!",
     rate: "",
     location: "",
     activityTitle: "",
-    activityType: "Coffee",
-    activityDesc: ""
+    activityTypes: [] as string[],
+    activityDesc: "",
+    activityDuration: "60",
+    activityPrice: "",
+    guestExpenseCap: "",
+    zoomMeeting: false,
+    routeNodes: [
+      { startTime: "14:00", endTime: "15:00", locationName: "", description: "" }
+    ]
   });
+
+  // Calculate total duration in hours based on route nodes
+  const calculateTotalHours = () => {
+    let totalMinutes = 0;
+    
+    formData.routeNodes.forEach(node => {
+      if (!node.startTime || !node.endTime) return;
+      
+      const parseTime = (timeStr: string) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return (hours * 60) + (minutes || 0);
+      };
+
+      const start = parseTime(node.startTime);
+      const end = parseTime(node.endTime);
+      
+      if (end > start) {
+        totalMinutes += (end - start);
+      }
+    });
+
+    return Math.round((totalMinutes / 60) * 10) / 10; // Round to 1 decimal
+  };
+
+  // Calculate total host fee
+  const totalHostFee = () => {
+    const hours = calculateTotalHours();
+    const rate = Number(formData.rate) || 0;
+    return Math.round(hours * rate);
+  };
+
+  const addRouteNode = () => {
+    setFormData(prev => ({
+      ...prev,
+      routeNodes: [...prev.routeNodes, { startTime: "", endTime: "", locationName: "", description: "" }]
+    }));
+  };
+
+  const removeRouteNode = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      routeNodes: prev.routeNodes.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleRouteNodeChange = (index: number, field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      routeNodes: prev.routeNodes.map((node, i) =>
+        i === index ? { ...node, [field]: value } : node
+      )
+    }));
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -43,7 +118,7 @@ export default function BecomeHostPage() {
     setActiveField(field);
   };
 
-  const connectInstagram = () => {
+  const startAiAnalysis = () => {
     setIsConnectingInsta(true);
     // Simulate API call to Instagram and AI processing
     setTimeout(() => {
@@ -67,6 +142,24 @@ export default function BecomeHostPage() {
       setIsConnectingInsta(false);
       setActiveField("analysis_complete");
     }, 2500);
+  };
+
+  const handleConnectClick = () => {
+    if (!hasFollowed) {
+      setShowFollowCheck(true);
+    } else {
+      startAiAnalysis();
+    }
+  };
+
+  const handleFollowConfirmation = () => {
+    setHasFollowed(true);
+    setShowFollowCheck(false);
+    startAiAnalysis();
+  };
+
+  const handleToggleChange = (name: string, value: boolean) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -167,7 +260,7 @@ export default function BecomeHostPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 bg-black">
+    <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           
@@ -186,7 +279,7 @@ export default function BecomeHostPage() {
             </div>
 
             {/* AI Connect Section */}
-            {!instaConnected && !isConnectingInsta && (
+            {!instaConnected && !isConnectingInsta && !showFollowCheck && (
               <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border border-purple-500/30 rounded-3xl p-8 space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -201,13 +294,51 @@ export default function BecomeHostPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={connectInstagram}
+                  onClick={handleConnectClick}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-white text-black font-bold hover:bg-zinc-200 transition-colors"
                 >
                   <Sparkles className="h-5 w-5 text-purple-600" />
                   Connect & Analyze
                 </button>
               </div>
+            )}
+
+            {/* Follow Requirement Check */}
+            {!instaConnected && !isConnectingInsta && showFollowCheck && (
+               <div className="bg-gradient-to-br from-pink-900/40 to-rose-900/40 border border-pink-500/30 rounded-3xl p-8 space-y-6 animate-in fade-in zoom-in duration-300">
+                <div className="flex items-center gap-4">
+                   <div className="h-12 w-12 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Instagram className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Step 1: Follow Official Account</h3>
+                     <p className="text-zinc-300">
+                      To use AI analysis, please follow our official Instagram first.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                   <a 
+                     href="https://www.instagram.com/soonmet_official" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="w-full flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:opacity-90 transition-opacity"
+                   >
+                     <Instagram className="h-5 w-5" />
+                     Follow @soonmet_official
+                   </a>
+                   
+                   <button
+                      type="button"
+                      onClick={handleFollowConfirmation}
+                      className="w-full flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-white/10 text-white font-semibold hover:bg-white/20 transition-colors border border-white/10"
+                   >
+                     <CheckCircle className="h-5 w-5 text-green-400" />
+                     I have followed
+                   </button>
+                </div>
+               </div>
             )}
 
             {isConnectingInsta && (
@@ -247,10 +378,17 @@ export default function BecomeHostPage() {
             <div className="bg-zinc-900/50 backdrop-blur-md border border-white/5 rounded-3xl p-6 sm:p-10">
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <User className="h-5 w-5 text-indigo-400" />
-                    Basic Info
-                  </h3>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-indigo-400" />
+                      AI-Crafted Profile
+                    </h3>
+                    <p className="text-sm text-zinc-400">
+                      Connect Instagram to let AI write this for you. We highly recommend using AI for the best results!
+                      <br/>
+                      <span className="text-xs text-zinc-500">(Manual entry is available if you skip AI, but you might miss out on the magic ✨)</span>
+                    </p>
+                  </div>
                   
                   <div className="grid grid-cols-1 gap-6">
                     <div className="space-y-2">
@@ -267,7 +405,7 @@ export default function BecomeHostPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Tagline</label>
+                      <label className="text-sm font-medium text-zinc-400">Tagline (AI Generated)</label>
                       <div className="relative">
                         <input 
                           required
@@ -286,7 +424,7 @@ export default function BecomeHostPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Bio</label>
+                      <label className="text-sm font-medium text-zinc-400">Bio (AI Generated)</label>
                       <div className="relative">
                         <textarea 
                           required
@@ -306,72 +444,22 @@ export default function BecomeHostPage() {
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-indigo-400" />
-                    Rate & Location
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Hourly Rate (¥)</label>
-                      <input 
-                        required
-                        type="number" 
-                        min="1000"
-                        name="rate"
-                        value={formData.rate}
-                        onChange={handleInputChange}
-                        onFocus={() => handleFocus('rate')}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                        placeholder="4000"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Location</label>
-                      <div className="relative">
-                        <MapPin className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500" />
-                        <input 
-                          required
-                          type="text" 
-                          name="location"
-                          value={formData.location}
-                          onChange={handleInputChange}
-                          onFocus={() => handleFocus('location')}
-                          className="w-full bg-black/40 border border-white/10 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                          placeholder="e.g. Tokyo, Japan"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+
 
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Camera className="h-5 w-5 text-indigo-400" />
-                    Profile Photo
-                  </h3>
-                  
-                  <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Camera className="h-8 w-8 text-zinc-400 mb-2" />
-                        <p className="text-sm text-zinc-400">Click to upload or drag and drop</p>
-                      </div>
-                      <input type="file" className="hidden" />
-                    </label>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-indigo-400" />
+                      Create Exp Local with Locals Event
+                    </h3>
+                    <p className="text-sm text-zinc-400">
+                      Make friends globally and earn while having fun
+                    </p>
                   </div>
-                </div>
-
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-indigo-400" />
-                    First &quot;Things Locals Know&quot; Event
-                  </h3>
                   
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Event Title</label>
+                      <label className="text-sm font-medium text-zinc-400">Experience Title</label>
                       <input 
                         required
                         type="text"
@@ -380,108 +468,262 @@ export default function BecomeHostPage() {
                         onChange={handleInputChange}
                         onFocus={() => handleFocus('activityTitle')}
                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                        placeholder="e.g. Coffee with me"
+                        placeholder="e.g. Tokyo Analog Underground"
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Category</label>
-                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-zinc-400">
+                        Get Inspired! <span className="text-zinc-500 font-normal">(If your idea isn't listed, you're just too creative!)</span>
+                      </label>
+                      <div className="flex flex-wrap gap-2">
                         {[
-                          { id: 'Coffee', icon: Coffee, label: 'Coffee' },
-                          { id: 'Food', icon: Utensils, label: 'Food' },
-                          { id: 'Shopping', icon: ShoppingBag, label: 'Shop' },
-                          { id: 'Walk', icon: Footprints, label: 'Walk' },
-                          { id: 'Art', icon: Camera, label: 'Art' },
-                        ].map((type) => (
-                          <button
-                            key={type.id}
-                            type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, activityType: type.id }))}
-                            className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-all ${
-                              formData.activityType === type.id
-                                ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300'
-                                : 'bg-black/40 border-white/10 text-zinc-400 hover:bg-white/5'
-                            }`}
-                          >
-                            <type.icon className="h-5 w-5" />
-                            <span className="text-xs">{type.label}</span>
-                          </button>
-                        ))}
+                          "Local Supermarket", "Walk Dog", "Flea Market", "Model Shop",
+                          "Internet Cafe", "Gaming Arcade", "Coffee Chat", "Izakaya",
+                          "Manga Cafe", "Home Visit", "Art Gallery", "Karaoke",
+                          "Thrift Shop", "Bookstore", "Park Picnic", "Street Food",
+                          "Record Store", "Shrine Walk", "Ramen Hunt", "Konbini Run",
+                          "Board Games", "Jazz Bar", "Cycling", "DIY Workshop",
+                          "More Creative Item"
+                        ].map((type) => {
+                          const isSelected = formData.activityTypes.includes(type);
+                          return (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => {
+                                  const current = prev.activityTypes;
+                                  if (current.includes(type)) {
+                                    return { ...prev, activityTypes: current.filter(t => t !== type) };
+                                  } else {
+                                    return { ...prev, activityTypes: [...current, type] };
+                                  }
+                                });
+                              }}
+                              className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+                                isSelected
+                                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] scale-105'
+                                  : 'bg-zinc-800/50 border-white/10 text-zinc-300 hover:bg-zinc-700 hover:text-white hover:border-white/30'
+                              }`}
+                            >
+                              {type}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-400">Description</label>
-                      <textarea 
-                        required
-                        rows={3}
-                        name="activityDesc"
-                        value={formData.activityDesc}
-                        onChange={handleInputChange}
-                        onFocus={() => handleFocus('activityDesc')}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                        placeholder="What will you do? e.g. Just hanging out at a cafe..."
-                      />
+                    {/* Route Builder */}
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-zinc-400">Experience Route (Itinerary)</label>
+                      </div>
+                      
+                      {formData.routeNodes.map((node, index) => (
+                        <div key={index} className="bg-black/20 rounded-xl p-4 border border-white/5 space-y-3 relative group">
+                          {/* Remove Button */}
+                          {formData.routeNodes.length > 1 && (
+                            <button 
+                              type="button" 
+                              onClick={() => removeRouteNode(index)}
+                              className="absolute right-2 top-2 p-1.5 text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
+
+                          {/* Header with Number */}
+                          <div className="flex items-center gap-2 mb-2">
+                             <div className="h-6 w-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold border border-indigo-500/30">
+                               {index + 1}
+                             </div>
+                             <span className="text-xs font-medium text-zinc-400">Route Segment</span>
+                          </div>
+
+                          {/* Time & Location */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-xs text-zinc-500">Time (Start - End)</label>
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-zinc-600" />
+                                <input 
+                                  type="text" 
+                                  placeholder="14:00" 
+                                  className="w-full bg-transparent border-b border-white/10 focus:border-indigo-500 outline-none text-sm py-1"
+                                  value={node.startTime}
+                                  onChange={(e) => handleRouteNodeChange(index, 'startTime', e.target.value)}
+                                />
+                                <span className="text-zinc-600">-</span>
+                                <input 
+                                  type="text" 
+                                  placeholder="15:00" 
+                                  className="w-full bg-transparent border-b border-white/10 focus:border-indigo-500 outline-none text-sm py-1"
+                                  value={node.endTime}
+                                  onChange={(e) => handleRouteNodeChange(index, 'endTime', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-1">
+                              <label className="text-xs text-zinc-500">Location Name</label>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-zinc-600" />
+                                <input 
+                                  type="text" 
+                                  placeholder="e.g. Hidden Jazz Bar" 
+                                  className="w-full bg-transparent border-b border-white/10 focus:border-indigo-500 outline-none text-sm py-1"
+                                  value={node.locationName}
+                                  onChange={(e) => handleRouteNodeChange(index, 'locationName', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <div className="space-y-1">
+                            <label className="text-xs text-zinc-500">What we'll do here</label>
+                            <textarea 
+                              rows={2}
+                              placeholder="Describe the activity..." 
+                              className="w-full bg-black/20 rounded-lg border border-white/5 p-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                              value={node.description}
+                              onChange={(e) => handleRouteNodeChange(index, 'description', e.target.value)}
+                            />
+                          </div>
+
+                          {/* Image Placeholder */}
+                          <div className="flex items-center gap-2 text-xs text-zinc-500 cursor-pointer hover:text-indigo-400 transition-colors border border-dashed border-zinc-700 rounded-lg p-2 justify-center hover:border-indigo-500/50 hover:bg-indigo-500/5">
+                            <ImageIcon className="h-4 w-4" />
+                            <span>Add Photo of this spot</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Duration (Minutes)</label>
-                        <select
-                          name="activityDuration"
-                          value={formData.activityDuration}
-                          onChange={handleInputChange}
-                          onFocus={() => handleFocus('activityDuration')}
-                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white"
+                    <button
+                      type="button"
+                      onClick={addRouteNode}
+                      className="w-full py-4 rounded-xl border-2 border-dashed border-zinc-700 text-zinc-400 font-semibold hover:border-indigo-500 hover:text-indigo-400 hover:bg-indigo-500/5 transition-all flex items-center justify-center gap-2 group"
+                    >
+                      <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                      Add Another Stop
+                    </button>
+
+                    {/* Summary & Pricing Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-white/10 space-y-6">
+                      <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+                        <Wallet className="h-5 w-5 text-indigo-400" />
+                        Cost & Duration Summary
+                      </h4>
+
+                      {/* Calculated Duration */}
+                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/5">
+                        <div>
+                          <p className="text-sm text-zinc-400">Total Duration</p>
+                          <p className="text-2xl font-bold text-white">{calculateTotalHours()} Hours</p>
+                        </div>
+                        <div className="text-right">
+                           <p className="text-xs text-zinc-500">Based on your route times</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {/* Hourly Rate Input */}
+                        <div className="space-y-2">
+                           <label className="text-sm font-medium text-zinc-400">Host Hourly Rate (¥)</label>
+                           <input
+                             required
+                             type="number"
+                             min="1000"
+                             name="rate"
+                             value={formData.rate}
+                             onChange={handleInputChange}
+                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                             placeholder="4000"
+                           />
+                        </div>
+
+                        {/* Guest Expense Cap */}
+                        <div className="space-y-2">
+                           <label className="text-sm font-medium text-zinc-400">Visitor Estimated Extra Cost (¥)</label>
+                           <input
+                             type="number"
+                             name="guestExpenseCap"
+                             value={formData.guestExpenseCap}
+                             onChange={handleInputChange}
+                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                             placeholder="e.g. 2000"
+                           />
+                           <p className="text-xs text-zinc-500 mt-1">Estimated cost for food, coffee, tickets, etc. (Paid by Visitor)</p>
+                        </div>
+                      </div>
+
+                      {/* Total Host Fee Display */}
+                      <div className="pt-4 border-t border-white/10">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-zinc-400">Total Host Earnings</p>
+                            <p className="text-xs text-zinc-500">¥{formData.rate || 0} x {calculateTotalHours()} hrs (Exclusive of visitor's extra costs)</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-3xl font-bold text-indigo-400">
+                              ¥{totalHostFee().toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-black/20 p-4 rounded-xl border border-white/5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${formData.zoomMeeting ? 'bg-blue-500/20 text-blue-400' : 'bg-zinc-800 text-zinc-500'}`}>
+                            <Video className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-medium text-white">Enable Pre-trip Zoom Consultation</p>
+                            <p className="text-xs text-zinc-400">Earn ¥1,500/hr for chatting with future guests</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleToggleChange('zoomMeeting', !formData.zoomMeeting);
+                            handleFocus('zoomMeeting');
+                          }}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.zoomMeeting ? 'bg-indigo-500' : 'bg-zinc-700'}`}
                         >
-                          <option value="30">30 Minutes</option>
-                          <option value="45">45 Minutes</option>
-                          <option value="60">60 Minutes</option>
-                          <option value="90">90 Minutes</option>
-                          <option value="120">2 Hours</option>
-                        </select>
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.zoomMeeting ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400">Event Price ($)</label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-3.5 text-zinc-500">$</span>
-                          <input 
-                            required
-                            type="number"
-                            min="0"
-                            name="activityPrice"
-                            value={formData.activityPrice}
-                            onChange={handleInputChange}
-                            onFocus={() => handleFocus('activityPrice')}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl pl-8 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                            placeholder="30"
-                          />
+                      {formData.zoomMeeting && (
+                        <div className="bg-white/5 rounded-lg p-4 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
+                          <h5 className="text-sm font-semibold text-white flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                            Policy & Pricing
+                          </h5>
+                          <ul className="space-y-2 text-xs text-zinc-400">
+                            <li className="flex items-start gap-2">
+                              <span className="text-indigo-400 font-bold">•</span>
+                              <span><strong className="text-zinc-300">Fixed Rate:</strong> ¥1,500 per hour (Pre-paid by visitor).</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-indigo-400 font-bold">•</span>
+                              <span><strong className="text-zinc-300">Process:</strong> Requires appointment. Email notifications sent to both parties.</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-indigo-400 font-bold">•</span>
+                              <span><strong className="text-zinc-300">Refund Policy:</strong> Full refund to visitor if you (Host) are a no-show or if system confirmation fails.</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-indigo-400 font-bold">•</span>
+                              <span><strong className="text-zinc-300">Cancellation:</strong> No refund to visitor if they are a no-show (You get paid).</span>
+                            </li>
+                          </ul>
                         </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between bg-black/20 p-4 rounded-xl border border-white/5">
-                      <div className="flex items-center gap-3">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${formData.zoomMeeting ? 'bg-blue-500/20 text-blue-400' : 'bg-zinc-800 text-zinc-500'}`}>
-                          <Video className="h-5 w-5" />
-                        </div>
-                        <div className="text-left">
-                          <p className="font-medium text-white">Online Zoom Meeting</p>
-                          <p className="text-xs text-zinc-400">Host this event virtually</p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleToggleChange('zoomMeeting', !formData.zoomMeeting);
-                          handleFocus('zoomMeeting');
-                        }}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.zoomMeeting ? 'bg-indigo-500' : 'bg-zinc-700'}`}
-                      >
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.zoomMeeting ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -574,7 +816,7 @@ export default function BecomeHostPage() {
                        <span className="text-xs text-zinc-500">2m ago</span>
                      </div>
                      <p className="text-xs text-zinc-400">
-                       You have <span className="text-green-400 font-bold">$45.00</span> ready to collect from yesterday&apos;s session.
+                       You have <span className="text-green-400 font-bold">¥4,500</span> ready to collect from yesterday&apos;s session.
                      </p>
                      <button className="mt-2 w-full flex items-center justify-center gap-2 py-1.5 bg-green-600/20 hover:bg-green-600/30 border border-green-600/30 rounded-lg text-xs font-medium text-green-400 transition-colors">
                         Collect Money <ArrowRight className="h-3 w-3" />

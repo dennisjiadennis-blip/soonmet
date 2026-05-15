@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { AgentChat } from "@/components/AgentChat";
+import { AuthProvider } from "@/context/AuthContext";
+import { AuthModal } from "@/components/AuthModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SoonMet - Connect with Local Hosts",
-  description: "Experience Japan with locals",
+  title: "AskALocal",
+  description: "The world's first vertical AI agent for travel.",
 };
 
 export default function RootLayout({
@@ -26,12 +29,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-white min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[#0f172a] text-white`}
       >
-        <Navbar />
-        <main className="pt-16">
-          {children}
-        </main>
+        <AuthProvider>
+          <Navbar />
+          <main>
+            {children}
+          </main>
+          <AgentChat />
+          <AuthModal />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -37,7 +37,7 @@ export default function MeetingPage() {
   if (!host) return <div className="p-10 text-center">Host not found</div>;
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col">
+    <main className="min-h-screen text-white flex flex-col">
       
       {/* Connected State (Zoom UI) */}
       {status === 'connected' && (
